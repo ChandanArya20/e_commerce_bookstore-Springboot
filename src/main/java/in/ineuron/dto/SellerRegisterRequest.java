@@ -15,11 +15,15 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 @NoArgsConstructor
-public class RegisterRequest {
+public class SellerRegisterRequest {
 
 	@NotBlank(message = "Name should not be empty")
 	@Size(min=3, message = "Name should be greater than 2")
 	String name;
+	
+	@NotBlank(message = "Location should not be empty")
+	@Size(min=3, message = "Location should be greater than 2")
+	String location;
 	
 	@NotBlank(message = "Phone No. should not be empty")
 	@Pattern(regexp = "^[6-9][0-9]*$", 
@@ -30,6 +34,11 @@ public class RegisterRequest {
 	@Email(regexp = "^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$", 
 	message="invalid email!")
 	String email;
+	
+	@NotBlank(message = "UserId should not be empty")
+    @Pattern(regexp = "^(?!.*\\s).*$",
+             message = "Space is not allowed between")
+	String userId;
 	
 	@NotBlank(message = "Password should not be empty")
     @Pattern(regexp = "^(?!.*\\s).*$",
@@ -54,5 +63,16 @@ public class RegisterRequest {
 	public void setPassword(String password) {
 		this.password = password.trim();
 	}
+
+
+	public void setLocation(String location) {
+		this.location = location.trim();
+	}
+
+
+	public void setUserName(String userId) {
+		this.userId = userId.trim();
+	}
+	
 	
 }

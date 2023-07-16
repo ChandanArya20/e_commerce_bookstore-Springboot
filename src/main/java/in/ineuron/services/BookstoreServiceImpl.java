@@ -5,7 +5,9 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import in.ineuron.models.BookSeller;
 import in.ineuron.models.User;
+import in.ineuron.repositories.SellerRepository;
 import in.ineuron.repositories.UserRepository;
 
 @Service
@@ -14,6 +16,13 @@ public class BookstoreServiceImpl implements BookstoreService {
 
 	@Autowired
 	UserRepository userRepo;
+	
+	@Autowired
+	SellerRepository sellerRepo;
+	
+	
+	
+	
 	
 	@Override
 	public Boolean isUserAvailableByPhone(String phone) {
@@ -39,6 +48,43 @@ public class BookstoreServiceImpl implements BookstoreService {
 	public User fetchUserByEmail(String email) {
 		return userRepo.findByEmail(email);
 	}
+	
+	
+	
+	
+	
+	
+	@Override
+	public Boolean isSellerAvailableByPhone(String phone) {
+		return sellerRepo.existsByPhone(phone);
+	}
+	@Override
+	public Boolean isSellerAvailableByEmail(String email) {
+		return sellerRepo.existsByEmail(email);
+	}
+	@Override
+	public Boolean isSellerAvailableByUserId(String userId) {
+		return sellerRepo.existsByUserId(userId);
+	}
+	@Override
+	public void registerSeller(BookSeller seller) {
+		sellerRepo.save(seller);
+		
+	}
+	@Override
+	public User fetchSellerByPhone(String phone) {
+		return sellerRepo.findByPhone(phone);
+	}
+	@Override
+	public User fetchSellerByEmail(String email) {
+		return sellerRepo.findByEmail(email);
+	}
+	@Override
+	public User fetchSellerByUserId(String userId) {
+		return sellerRepo.findByUserId(userId);
+	}
+
+	
 
 	
 	
@@ -51,33 +97,5 @@ public class BookstoreServiceImpl implements BookstoreService {
 	
 	
 	
-	
-	
-//	@Override
-//	public String authenticateUserByPhone(String phone, String password) {
-//		
-//		User registeredData = userRepo.findByPhone(phone);
-//		if (registeredData == null)
-//			return "notFound";
-//				
-//		if(registeredData.getPassword().equals(password))		
-//	        return "success";
-//	    else {
-//	        return "wrongPassword";
-//	    }
-//	}
-//	@Override
-//	public String authenticateUserByEmail(String email, String password) {
-//		
-//		User registeredData = userRepo.findByEmail(email);
-//		if (registeredData == null)
-//			return "notFound";
-//		
-//		if(registeredData.getPassword().equals(password))		
-//			return "success";
-//		else {
-//			return "wrongPassword";
-//		}
-//	}
 
 }

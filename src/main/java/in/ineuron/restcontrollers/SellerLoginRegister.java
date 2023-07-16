@@ -20,7 +20,7 @@ import in.ineuron.services.BookstoreService;
 
 @RestController
 @RequestMapping("/api/user")
-public class UserLoginRegister {
+public class SellerLoginRegister {
 
 	@Autowired
 	BookstoreService service;
