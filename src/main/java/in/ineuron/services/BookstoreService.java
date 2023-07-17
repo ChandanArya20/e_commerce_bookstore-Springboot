@@ -13,10 +13,10 @@ public interface BookstoreService {
 	
 	public Boolean isSellerAvailableByPhone(String phone);
 	public Boolean isSellerAvailableByEmail(String email);
-	public Boolean isSellerAvailableByUserId(String userId);
+	public Boolean isSellerAvailableBySellerId(String sellerId);
 	public void registerSeller(BookSeller seller);
-	public User fetchSellerByPhone(String phone);
-	public User fetchSellerByEmail(String email);
-	public User fetchSellerByUserId(String userId);
+	public BookSeller fetchSellerByPhone(String phone);
+	public BookSeller fetchSellerByEmail(String email);
+	public BookSeller fetchSellerBySellerId(String sellerId);
 
 }

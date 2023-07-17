@@ -52,7 +52,6 @@ public class Book {
     @Column(nullable = false)
     private int stockAvailability;
     
-    @Column(nullable = false)
     @ManyToOne
     private BookSeller bookSeller;
      

@@ -9,9 +9,9 @@ public interface SellerRepository extends JpaRepository<BookSeller, Long> {
 	
 	 public boolean existsByPhone(String phone);
 	 public boolean existsByEmail(String email);
-	 public boolean existsByUserId(String userId);
-	 public User findByPhone(String phone);
-	 public User findByEmail(String email);
-	 public User findByUserId(String userid);
+	 public boolean existsBySellerId(String sellerId);
+	 public BookSeller findByPhone(String phone);
+	 public BookSeller findByEmail(String email);
+	 public BookSeller findBySellerId(String sellerId);
 
 }

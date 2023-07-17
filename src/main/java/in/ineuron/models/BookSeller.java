@@ -35,7 +35,7 @@ public class BookSeller {
     private String phone;
   
     @Column(unique = true, nullable = false)
-    private String userId;
+    private String sellerId;
     
     @Column(nullable = false)
     private String password;
@@ -43,7 +43,7 @@ public class BookSeller {
     @OneToMany(mappedBy = "bookSeller", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Book> books;
     
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	List<Address> address;
 
     
@@ -67,8 +67,8 @@ public class BookSeller {
 		return phone;
 	}
 
-	public String getUserId() {
-		return userId;
+	public String getSellerId() {
+		return sellerId;
 	}
 
 	@JsonIgnore

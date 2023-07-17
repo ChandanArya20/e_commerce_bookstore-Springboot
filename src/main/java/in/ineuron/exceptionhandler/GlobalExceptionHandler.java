@@ -17,7 +17,7 @@ public class GlobalExceptionHandler {
 //    @ResponseBody
     public ResponseEntity<ExceptionDetails> handleException(Exception ex) {
     	
-    	System.out.println("srroe occured");
+    	System.out.println(ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ExceptionDetails(LocalDateTime.now(), ex.getMessage(), "Something went wrong..."));
     }

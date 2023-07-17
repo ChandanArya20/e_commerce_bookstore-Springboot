@@ -1,3 +1,5 @@
+package in.ineuron.models;
+
 import javax.persistence.*;
 
 import lombok.Data;

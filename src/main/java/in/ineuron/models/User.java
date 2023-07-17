@@ -40,7 +40,7 @@ public class User {
 	@Column(nullable = false)
 	String password;
 	
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	List<Address> address;
 	
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

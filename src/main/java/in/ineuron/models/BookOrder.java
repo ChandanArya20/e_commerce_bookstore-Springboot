@@ -28,8 +28,10 @@ public class BookOrder {
     @Column(nullable = false)
     private String status;
     
+    @OneToOne
+    private Book book;
+    
     @ManyToOne
-    @Column(nullable = false)
     private User user;
     
 }

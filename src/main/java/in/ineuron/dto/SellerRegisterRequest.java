@@ -35,10 +35,10 @@ public class SellerRegisterRequest {
 	message="invalid email!")
 	String email;
 	
-	@NotBlank(message = "UserId should not be empty")
+	@NotBlank(message = "SellerId should not be empty")
     @Pattern(regexp = "^(?!.*\\s).*$",
              message = "Space is not allowed between")
-	String userId;
+	String sellerId;
 	
 	@NotBlank(message = "Password should not be empty")
     @Pattern(regexp = "^(?!.*\\s).*$",
@@ -70,8 +70,8 @@ public class SellerRegisterRequest {
 	}
 
 
-	public void setUserName(String userId) {
-		this.userId = userId.trim();
+	public void setSellerId(String sellerId) {
+		this.sellerId = sellerId.trim();
 	}
 	
 	

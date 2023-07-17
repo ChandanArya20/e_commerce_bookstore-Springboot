@@ -63,8 +63,8 @@ public class BookstoreServiceImpl implements BookstoreService {
 		return sellerRepo.existsByEmail(email);
 	}
 	@Override
-	public Boolean isSellerAvailableByUserId(String userId) {
-		return sellerRepo.existsByUserId(userId);
+	public Boolean isSellerAvailableBySellerId(String sellerId) {
+		return sellerRepo.existsBySellerId(sellerId);
 	}
 	@Override
 	public void registerSeller(BookSeller seller) {
@@ -72,16 +72,16 @@ public class BookstoreServiceImpl implements BookstoreService {
 		
 	}
 	@Override
-	public User fetchSellerByPhone(String phone) {
+	public BookSeller fetchSellerByPhone(String phone) {
 		return sellerRepo.findByPhone(phone);
 	}
 	@Override
-	public User fetchSellerByEmail(String email) {
+	public BookSeller fetchSellerByEmail(String email) {
 		return sellerRepo.findByEmail(email);
 	}
 	@Override
-	public User fetchSellerByUserId(String userId) {
-		return sellerRepo.findByUserId(userId);
+	public BookSeller fetchSellerBySellerId(String sellerId) {
+		return sellerRepo.findBySellerId(sellerId);
 	}
 
 	
