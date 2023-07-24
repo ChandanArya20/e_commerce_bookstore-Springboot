@@ -1,5 +1,6 @@
 package in.ineuron.services;
 
+import in.ineuron.models.Book;
 import in.ineuron.models.BookSeller;
 import in.ineuron.models.User;
 
@@ -18,5 +19,9 @@ public interface BookstoreService {
 	public BookSeller fetchSellerByPhone(String phone);
 	public BookSeller fetchSellerByEmail(String email);
 	public BookSeller fetchSellerBySellerId(String sellerId);
+	
+	
+	public void insertBookInfo(Book book);
+	public Book fetchBookBySeller(BookSeller seller);
 
 }

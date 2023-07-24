@@ -1,5 +1,7 @@
 package in.ineuron.models;
 
+import java.time.LocalDate;
+
 import javax.persistence.*;
 
 import lombok.Data;
@@ -19,12 +21,13 @@ public class Book {
     @Column(nullable = false)
     private String author;
 
-//    @Column(nullable = false)
-//    private String isbn;
-
     @Column(nullable = false)
     private String description;
+    
+   
+    private String isbn;
 
+    @Lob
     @Column(nullable = false)
     private byte[] coverImage;
 
@@ -38,10 +41,9 @@ public class Book {
     private String category;
 
     @Column(nullable = false)
-    private int publicationYear;
+    private LocalDate publishingYear;
 
-    @Column(nullable = false)
-    private int numberOfPages;
+    private int pages;
 
     @Column(nullable = false)
     private String publisher;
@@ -51,6 +53,11 @@ public class Book {
 
     @Column(nullable = false)
     private int stockAvailability;
+    
+    @Column(nullable = false)
+    private int deliveryTime;
+    
+    private int edition;
     
     @ManyToOne
     private BookSeller bookSeller;
