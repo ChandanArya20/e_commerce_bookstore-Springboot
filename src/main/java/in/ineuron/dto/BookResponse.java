@@ -15,7 +15,11 @@ public class BookResponse {
     
     private double price;
     
+    private int stockAvailability;
+    
     private String imageURL;
+    
+    private Boolean status;
 
 	
 }

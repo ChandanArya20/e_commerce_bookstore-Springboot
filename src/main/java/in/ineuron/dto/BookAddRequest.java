@@ -9,6 +9,8 @@ import lombok.Data;
 public class BookAddRequest {
 
 
+	private Long id;
+	
     private String title;
 
     
@@ -53,6 +55,7 @@ public class BookAddRequest {
     private int edition;
     
     private BookSeller bookSeller;
+    
         
 }
 

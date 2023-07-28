@@ -40,11 +40,14 @@ public class User {
 	@Column(nullable = false)
 	String password;
 	
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	List<Address> address;
 	
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	List<BookOrder> orders;
+	
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	List<Cart> cart;
 	
 	
 

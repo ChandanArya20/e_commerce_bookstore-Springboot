@@ -40,11 +40,10 @@ public class BookSeller {
     @Column(nullable = false)
     private String password;
     
-    @JsonIgnore
     @OneToMany(mappedBy = "bookSeller", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Book> books;
     
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	List<Address> address;
 
     

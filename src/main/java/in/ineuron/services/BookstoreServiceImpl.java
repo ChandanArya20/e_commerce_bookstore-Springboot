@@ -1,5 +1,7 @@
 package in.ineuron.services;
 
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,8 +9,10 @@ import org.springframework.stereotype.Service;
 
 import in.ineuron.models.Book;
 import in.ineuron.models.BookSeller;
+import in.ineuron.models.ImageFile;
 import in.ineuron.models.User;
 import in.ineuron.repositories.BookRepositery;
+import in.ineuron.repositories.ImageFileRepository;
 import in.ineuron.repositories.SellerRepository;
 import in.ineuron.repositories.UserRepository;
 
@@ -24,6 +28,9 @@ public class BookstoreServiceImpl implements BookstoreService {
 	
 	@Autowired
 	BookRepositery bookRepo;
+	
+	@Autowired
+	ImageFileRepository imageFileRepo;
 	
 	
 	
@@ -90,9 +97,37 @@ public class BookstoreServiceImpl implements BookstoreService {
 		Book savedResult = bookRepo.save(book);
 	}
 	@Override
-	public Book fetchBookBySeller(BookSeller seller) {
-
+	public List<Book> fetchBooksBySellerId(Long sellerId) {
+		BookSeller seller = new BookSeller();
+		seller.setId(sellerId);
 		return bookRepo.findByBookSeller(seller);
+	}
+	@Override
+	public ImageFile fetchBookImageById(Long id) {
+		return imageFileRepo.findById(id).orElse(null);
+	}
+	@Override
+	public Book fetchBookById(Long id) {
+		return bookRepo.findById(id).orElse(null);
+	}
+	@Override
+	public Book updateBook(Book book) {	
+		return bookRepo.save(book);
+	}
+	@Override
+	public Boolean checkBookStatus(Long id) {
+		return bookRepo.findBookStatusById(id);
+	}
+
+	@Override
+	public Integer activateBookStatus(Long id) {
+		
+		return bookRepo.activateBookStatusById(id);
+	}
+	@Override
+	public Integer deactivateBookStatus(Long id) {
+		
+		return bookRepo.deactivateBookStatusById(id);
 	}
 
 	

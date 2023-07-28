@@ -1,7 +1,10 @@
 package in.ineuron.services;
 
+import java.util.List;
+
 import in.ineuron.models.Book;
 import in.ineuron.models.BookSeller;
+import in.ineuron.models.ImageFile;
 import in.ineuron.models.User;
 
 public interface BookstoreService {
@@ -22,6 +25,12 @@ public interface BookstoreService {
 	
 	
 	public void insertBookInfo(Book book);
-	public Book fetchBookBySeller(BookSeller seller);
+	public List<Book> fetchBooksBySellerId(Long sellerId);
+	public ImageFile fetchBookImageById(Long id);
+	public Book fetchBookById(Long id);
+	public Book updateBook(Book book);
+	public Boolean checkBookStatus(Long id);
+	public Integer activateBookStatus(Long id);
+	public Integer deactivateBookStatus(Long id);
 
 }

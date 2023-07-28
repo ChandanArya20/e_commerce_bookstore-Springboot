@@ -4,6 +4,8 @@ import java.time.LocalDate;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 
 @Entity
@@ -28,8 +30,8 @@ public class Book {
     private String isbn;
 
     @Lob
-    @Column(nullable = false)
-    private byte[] coverImage;
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    private ImageFile coverImage;
 
     @Column(nullable = false)
     private double price;
@@ -68,8 +70,8 @@ public class Book {
     
 //    private String comments;
     
-    
-    
-    
+    @Column(nullable = false)
+    private Boolean status=true;
+       
 }
 
