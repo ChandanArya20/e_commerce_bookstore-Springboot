@@ -8,15 +8,21 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
+import lombok.Data;
+
 @Entity
+@Data
 public class Cart {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Integer id;
+	Long id;
 	
 	@OneToOne
 	Book book;
+	
+	@Column(nullable = false)
+	Integer quantity=1;
 	
 	@ManyToOne
 	User user;

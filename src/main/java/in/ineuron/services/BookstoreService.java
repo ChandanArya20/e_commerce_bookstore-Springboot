@@ -3,7 +3,9 @@ package in.ineuron.services;
 import java.util.List;
 
 import in.ineuron.models.Book;
+import in.ineuron.models.BookOrder;
 import in.ineuron.models.BookSeller;
+import in.ineuron.models.Cart;
 import in.ineuron.models.ImageFile;
 import in.ineuron.models.User;
 
@@ -32,5 +34,28 @@ public interface BookstoreService {
 	public Boolean checkBookStatus(Long id);
 	public Integer activateBookStatus(Long id);
 	public Integer deactivateBookStatus(Long id);
+	
+	public Boolean insertCartData(Cart cart);
+	public List<Cart> getAllCartDataByUser(User user);
+	public Boolean updateCartItemQuantity(Cart cart);
+	public Boolean deleteCartItems(Cart[] carts);
+	
+	public Boolean insertOrder(List<BookOrder> orders);
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -5,6 +5,8 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.Data;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -19,20 +21,28 @@ public class BookOrder {
 
     @CreationTimestamp
     @Column(nullable = false)
-    private Date orderDate;
+    private LocalDateTime orderDateTime;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date deliveryDate;
+    @Column(nullable = false)
+    private LocalDate deliveryDate;
 
 //    @Enumerated(EnumType.STRING)
+//	  {Pending, Processing, Shipped, Delivered, Cancelled, Returned} 
     @Column(nullable = false)
-    private String status;
+    private String status="Pending";
     
     @OneToOne
     private Book book;
     
+    @Column(nullable = false)
+    private Integer quantity;
+    
+    @OneToOne
+    private Address deliveryAddress;
+    
     @ManyToOne
     private User user;
+    
     
 }
 

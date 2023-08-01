@@ -44,7 +44,7 @@ import lombok.val;
 
 @RestController
 @RequestMapping("/api/seller/book")
-public class SellerService {
+public class SellerServiceController {
 
 	@Autowired
 	BookstoreService service;

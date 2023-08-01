@@ -62,6 +62,7 @@ public class Book {
     private int edition;
     
     @ManyToOne
+    @JsonIgnore
     private BookSeller bookSeller;
      
 

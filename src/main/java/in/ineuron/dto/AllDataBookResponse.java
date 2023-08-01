@@ -51,8 +51,7 @@ public class AllDataBookResponse {
 	    
 	    private int edition;
 	    
-	    @ManyToOne
-	    private BookSeller bookSeller;
+//	    private BookSeller bookSeller;
 	     
 
 //	    @Column(nullable = false)

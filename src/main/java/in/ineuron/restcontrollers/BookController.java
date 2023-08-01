@@ -51,12 +51,9 @@ public class BookController {
 	public ResponseEntity<?> updateBookData(@RequestParam MultipartFile coverImage, @RequestParam String bookInfo) throws IOException{
 	
 		BookAddRequest bookRequest = mapper.readValue(bookInfo, BookAddRequest.class);
-		System.out.println(bookInfo);
-		System.out.println(bookRequest);
 		
 		Book book = new Book();
 		BeanUtils.copyProperties(bookRequest, book);
-		System.out.println(book);
 		
 		ImageFile imageFile = new ImageFile();
 		imageFile.setName(coverImage.getOriginalFilename());
@@ -73,7 +70,7 @@ public class BookController {
 		
 	}
 	
-	@GetMapping("seller/allBook/{sellerId}")
+	@GetMapping("seller/{sellerId}/allBook")
 	public ResponseEntity<List<BookResponse>> getBookBySeller(@PathVariable Long sellerId){
 		 		
 		List<Book> bookList = service.fetchBooksBySellerId(sellerId);	
@@ -108,7 +105,7 @@ public class BookController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("book not found for this book id");		
 	}
 		
-	@PutMapping("seller/update")
+	@PutMapping("seller/updateBook")
 	public ResponseEntity<String> updateBook(@RequestParam MultipartFile coverImage, @RequestParam String bookInfo) throws IOException{
 		
 		BookAddRequest bookRequest = mapper.readValue(bookInfo, BookAddRequest.class);
@@ -134,7 +131,7 @@ public class BookController {
 		return ResponseEntity.ok(msg);
 	}
 	
-	@PatchMapping("/changeStatus/{id}")
+	@PatchMapping("/{id}/changeStatus")
 	public ResponseEntity<String> changeBookStatus(@PathVariable Long id) {
 		
 		Boolean status=service.checkBookStatus(id);
