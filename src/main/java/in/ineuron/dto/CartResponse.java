@@ -8,7 +8,7 @@ public class CartResponse {
 
 	Long id;
 	
-	AllDataBookResponse book;
+	BookResponse book;
 	
 	Integer quantity;
 }

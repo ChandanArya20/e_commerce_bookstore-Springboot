@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ch.qos.logback.core.joran.util.beans.BeanUtil;
 import in.ineuron.dto.AllDataBookResponse;
+import in.ineuron.dto.BookResponse;
 import in.ineuron.dto.CartResponse;
 import in.ineuron.models.Cart;
 import in.ineuron.models.User;
@@ -62,11 +63,11 @@ public class CartController {
 			CartResponse cartResponse = new CartResponse();
 			BeanUtils.copyProperties(cart, cartResponse);
 			
-			AllDataBookResponse allDataBookResponse = new AllDataBookResponse();
-			BeanUtils.copyProperties(cart.getBook(), allDataBookResponse);
-			allDataBookResponse.setImageURL(baseURL+"/api/image/"+cart.getBook().getCoverImage().getId());
+			BookResponse bookResponse = new BookResponse();
+			BeanUtils.copyProperties(cart.getBook(), bookResponse);
+			bookResponse.setImageURL(baseURL+"/api/image/"+cart.getBook().getCoverImage().getId());
 			
-			cartResponse.setBook(allDataBookResponse);
+			cartResponse.setBook(bookResponse);
 			cartResponseList.add(cartResponse);
 		});
 		

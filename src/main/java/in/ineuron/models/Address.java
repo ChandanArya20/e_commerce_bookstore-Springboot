@@ -18,7 +18,6 @@ public class Address {
 	
 	String name;
 	
-	@Column(unique = true)
 	String phone;
 	
 	String pincode;

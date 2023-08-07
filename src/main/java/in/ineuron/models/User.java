@@ -19,7 +19,6 @@ import lombok.ToString;
 
 
 @Setter
-@ToString
 @NoArgsConstructor
 @Entity
 public class User {
@@ -43,10 +42,10 @@ public class User {
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	List<Address> address;
 	
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany( mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	List<BookOrder> orders;
 	
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	List<Cart> cart;
 	
 	
@@ -71,6 +70,7 @@ public class User {
 		return address;
 	}
 	
+	@JsonIgnore
 	public List<BookOrder> getOrders() {
 		return orders;
 	}
@@ -78,6 +78,17 @@ public class User {
 	@JsonIgnore
 	public String getPassword() {
 		return password;
+	}
+
+	@JsonIgnore
+	public List<Cart> getCart() {
+		return cart;
+	}
+
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", name=" + name + ", phone=" + phone + ", email=" + email + ", password=" + password
+				+ ", address=" + address + "]";
 	}
 
 		

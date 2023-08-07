@@ -2,12 +2,16 @@ package in.ineuron.services;
 
 import java.util.List;
 
+import in.ineuron.dto.AddressRequest;
+import in.ineuron.dto.UserResponse;
+import in.ineuron.models.Address;
 import in.ineuron.models.Book;
 import in.ineuron.models.BookOrder;
 import in.ineuron.models.BookSeller;
 import in.ineuron.models.Cart;
 import in.ineuron.models.ImageFile;
 import in.ineuron.models.User;
+import in.ineuron.returntype.AddressReturn;
 
 public interface BookstoreService {
 
@@ -16,6 +20,9 @@ public interface BookstoreService {
 	public void registerUser(User user);
 	public User fetchUserByPhone(String phone);
 	public User fetchUserByEmail(String email);
+	public UserResponse fetchUserDetails(Long userId);
+	public List<Address>  fetchAddressByUserId(Long userId);
+	public Boolean insertUserAddress(AddressRequest address,  Long userId);
 	
 	public Boolean isSellerAvailableByPhone(String phone);
 	public Boolean isSellerAvailableByEmail(String email);
@@ -41,6 +48,8 @@ public interface BookstoreService {
 	public Boolean deleteCartItems(Cart[] carts);
 	
 	public Boolean insertOrder(List<BookOrder> orders);
+	public List<BookOrder> fetchOrdersByUser(User user);
+	
 
 }
 

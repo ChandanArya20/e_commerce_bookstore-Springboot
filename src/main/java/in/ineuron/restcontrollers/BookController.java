@@ -96,10 +96,10 @@ public class BookController {
 		
 		Book book = service.fetchBookById(id);		
 		if(book!=null) {
-			AllDataBookResponse allDataBookResponse = new AllDataBookResponse();
-			BeanUtils.copyProperties(book, allDataBookResponse);
-			allDataBookResponse.setImageURL(baseURL+"/api/image/"+book.getCoverImage().getId());
-			return ResponseEntity.ok(allDataBookResponse);
+			BookResponse bookResponse = new BookResponse();
+			BeanUtils.copyProperties(book, bookResponse);
+			bookResponse.setImageURL(baseURL+"/api/image/"+book.getCoverImage().getId());
+			return ResponseEntity.ok(bookResponse);
 			
 		}else
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("book not found for this book id");		

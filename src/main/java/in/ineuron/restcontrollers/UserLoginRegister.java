@@ -7,15 +7,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import in.ineuron.dto.AddressRequest;
 import in.ineuron.dto.LoginRequest;
 import in.ineuron.dto.LoginResponse;
 import in.ineuron.dto.RegisterRequest;
+import in.ineuron.dto.UserResponse;
+import in.ineuron.models.Address;
 import in.ineuron.models.User;
+import in.ineuron.returntype.AddressReturn;
 import in.ineuron.services.BookstoreService;
 
 @RestController
@@ -25,8 +30,8 @@ public class UserLoginRegister {
 	@Autowired
 	BookstoreService service;
 	
-	Integer i;
 	
+		
 	@PostMapping("/register") 
 	public ResponseEntity<?> registerUser(@RequestBody RegisterRequest requestData){
 			
@@ -49,7 +54,9 @@ public class UserLoginRegister {
 			 else
 				 response.setToken((user.getEmail()+user.getName()).replace(" ",""));
 				 
-			 response.setUser(user);
+			 UserResponse userResponse = new UserResponse();
+			 BeanUtils.copyProperties(user, userResponse);
+			 response.setUser(userResponse);
 			
 			 return ResponseEntity.ok(response);
 		 }        
@@ -71,9 +78,14 @@ public class UserLoginRegister {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
 				
 			}else {
+				
 				LoginResponse response = new LoginResponse();
+				
+				UserResponse userResponse = new UserResponse();
+				BeanUtils.copyProperties(user, userResponse);
+				response.setUser(userResponse);
+				
 				response.setToken((user.getPhone()+user.getName()).replace(" ",""));
-				response.setUser(user);
 				
 				return ResponseEntity.ok(response);
 			}
@@ -91,13 +103,60 @@ public class UserLoginRegister {
 	        	
 	        }else {
 	        	LoginResponse response = new LoginResponse();
+	        	
+	        	UserResponse userResponse = new UserResponse();
+				BeanUtils.copyProperties(user, userResponse);
+				response.setUser(userResponse);
+				response.setUser(userResponse);
+				
 				response.setToken((user.getEmail()+user.getName()).replace(" ", ""));
-				response.setUser(user);
 				
 				return ResponseEntity.ok(response);
 	        }
 		}
+		
 
     }	
 	
+	@GetMapping("/{userId}")
+	public ResponseEntity<?> getWholeUserData( @PathVariable Long userId){
+		
+		UserResponse userResponse = service.fetchUserDetails(userId);
+		if(userResponse!=null)
+			return ResponseEntity.ok(userResponse);
+		else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User id not found");
+		}
+	}
+	
+	@PostMapping("/{userId}/saveAddress")
+	public ResponseEntity<String> saveUserAddress(@RequestBody AddressRequest address,  @PathVariable Long userId){
+		
+		System.out.println(address);
+		Boolean status = service.insertUserAddress(address, userId);
+		
+		if(status) {
+			return ResponseEntity.ok("Address saved successfully...");
+		} else {
+			return ResponseEntity.badRequest().body("Failed..., UserId not found");
+		}
+	}
+	
+	@GetMapping("/{userId}/address")
+	public ResponseEntity<?> getUserAddress( @PathVariable Long userId){
+		
+		List<Address> addresses = service.fetchAddressByUserId(userId);
+		
+		if(addresses!=null)
+			return ResponseEntity.ok(addresses);
+		else
+			return ResponseEntity.badRequest().body("Failed..., UserId not found");
+	}
+	
+	
+	
 }
+
+
+
+
