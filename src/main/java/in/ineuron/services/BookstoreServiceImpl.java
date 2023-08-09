@@ -110,6 +110,7 @@ public class BookstoreServiceImpl implements BookstoreService {
 			System.out.println(addressObj);
 			userAddress.add(addressObj);
 			userRepo.save(user);
+			entityManager.flush();
 			return true;
 			
 		} else {
@@ -262,7 +263,8 @@ public class BookstoreServiceImpl implements BookstoreService {
 	@Override
 	public Boolean deleteCartItems(Cart[] carts) {
 		
-		for(Cart cart: carts){			
+		for(Cart cart: carts){	
+			
 			cartRepo.delete(cart);
 		}
 		
@@ -284,6 +286,17 @@ public class BookstoreServiceImpl implements BookstoreService {
 	public List<BookOrder> fetchOrdersByUser(User user) {
 		
 		return orderRepo.findByUser(user);
+	}
+
+	@Override
+	public Boolean changeOrderStatus(Long orderId, String status) {
+		
+		Integer updateOrderStatus = orderRepo.updateOrderStatus(orderId, status);
+		
+		if(updateOrderStatus==1)
+			return true;
+		else		
+			return false;
 	}
 
 	

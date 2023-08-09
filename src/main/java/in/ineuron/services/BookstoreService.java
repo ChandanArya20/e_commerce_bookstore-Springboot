@@ -49,6 +49,7 @@ public interface BookstoreService {
 	
 	public Boolean insertOrder(List<BookOrder> orders);
 	public List<BookOrder> fetchOrdersByUser(User user);
+	public Boolean changeOrderStatus(Long orderId, String status);
 	
 
 }

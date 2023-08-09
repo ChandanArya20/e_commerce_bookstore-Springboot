@@ -27,9 +27,9 @@ public class BookOrder {
     private LocalDate deliveryDate;
 
 //    @Enumerated(EnumType.STRING)
-//	  {Pending, Processing, Shipped, Delivered, Cancelled, Returned} 
+//	  {Pending, Confirmed, Shipped, Delivered, Cancelled, Returned} 
     @Column(nullable = false)
-    private String status="Pending";
+    private String status="Confirmed";
     
     @OneToOne
     private Book book;
@@ -42,8 +42,7 @@ public class BookOrder {
     
     @ManyToOne
     private User user;
-    
-    
+       
 }
 
    
