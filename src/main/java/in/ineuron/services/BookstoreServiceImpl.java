@@ -1,5 +1,6 @@
 package in.ineuron.services;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,10 +11,13 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import ch.qos.logback.core.joran.util.beans.BeanUtil;
 import in.ineuron.dto.AddressRequest;
+import in.ineuron.dto.BookOrderResponse;
+import in.ineuron.dto.BookResponse;
 import in.ineuron.dto.UserResponse;
 import in.ineuron.models.Address;
 import in.ineuron.models.Book;
@@ -54,6 +58,9 @@ public class BookstoreServiceImpl implements BookstoreService {
 	
 	@Autowired
 	private EntityManager entityManager;
+	
+	@Value("${baseURL}")
+	private String baseURL;
 	
 	
 	
@@ -283,9 +290,34 @@ public class BookstoreServiceImpl implements BookstoreService {
 			return false;
 	}
 	@Override
-	public List<BookOrder> fetchOrdersByUser(User user) {
+	public List<BookOrderResponse> fetchOrdersByUser(User user) {
 		
-		return orderRepo.findByUser(user);
+		List<BookOrder> orderList = orderRepo.findByUser(user);
+		
+		List<BookOrderResponse> orders = new ArrayList<>();
+		
+		orderList.forEach(order->{
+			
+			BookOrderResponse orderResponse = new BookOrderResponse();
+			BeanUtils.copyProperties(order, orderResponse);
+			
+			int year = order.getOrderDateTime().getYear();
+			int month = order.getOrderDateTime().getMonthValue();
+			int day = order.getOrderDateTime().getDayOfMonth();
+			
+			LocalDate orderDate= LocalDate.of(year, month, day);
+			orderResponse.setOrderDate(orderDate);
+			
+			
+			BookResponse bookResponse = new BookResponse();
+			BeanUtils.copyProperties(order.getBook(), bookResponse);
+			bookResponse.setImageURL(baseURL+"/api/image/"+order.getBook().getCoverImage().getId());
+			
+			orderResponse.setBook(bookResponse);
+			orders.add(orderResponse);
+		});
+		
+		return orders;
 	}
 
 	@Override
@@ -297,6 +329,39 @@ public class BookstoreServiceImpl implements BookstoreService {
 			return true;
 		else		
 			return false;
+	}
+
+	@Override
+	public List<BookOrderResponse> fetchOrdersBySellerId(Long id) {
+		
+		List<Book> bookList = fetchBooksBySellerId(id);
+		
+		List<BookOrder> orderList = orderRepo.findByBook(bookList);
+		
+		List<BookOrderResponse> orders = new ArrayList<>(); 
+		
+			orderList.forEach(order->{
+			
+			BookOrderResponse orderResponse = new BookOrderResponse();
+			BeanUtils.copyProperties(order, orderResponse);
+			
+			int year = order.getOrderDateTime().getYear();
+			int month = order.getOrderDateTime().getMonthValue();
+			int day = order.getOrderDateTime().getDayOfMonth();
+			
+			LocalDate orderDate= LocalDate.of(year, month, day);
+			orderResponse.setOrderDate(orderDate);
+			
+			
+			BookResponse bookResponse = new BookResponse();
+			BeanUtils.copyProperties(order.getBook(), bookResponse);
+			bookResponse.setImageURL(baseURL+"/api/image/"+order.getBook().getCoverImage().getId());
+			
+			orderResponse.setBook(bookResponse);
+			orders.add(orderResponse);
+		});
+		
+		return orders;
 	}
 
 	

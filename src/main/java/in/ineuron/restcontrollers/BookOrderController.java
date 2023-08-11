@@ -24,7 +24,9 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import in.ineuron.dto.BookOrderRequest;
 import in.ineuron.dto.BookResponse;
 import in.ineuron.dto.BookOrderResponse;
+import in.ineuron.models.Book;
 import in.ineuron.models.BookOrder;
+import in.ineuron.models.BookSeller;
 import in.ineuron.models.User;
 import in.ineuron.services.BookstoreService;
 
@@ -66,34 +68,18 @@ public class BookOrderController {
 		User user = new User();
 		user.setId(userId);
 		
-		List<BookOrder> orderList = service.fetchOrdersByUser(user);
-		
-		orderList.forEach(item->System.out.println(item.getOrderDateTime()));
-		
-		List<BookOrderResponse> orders = new ArrayList<>();
-		
-		orderList.forEach(order->{
+		List<BookOrderResponse> orders = service.fetchOrdersByUser(user);
 			
-			BookOrderResponse orderResponse = new BookOrderResponse();
-			BeanUtils.copyProperties(order, orderResponse);
-			
-			int year = order.getOrderDateTime().getYear();
-			int month = order.getOrderDateTime().getMonthValue();
-			int day = order.getOrderDateTime().getDayOfMonth();
-			
-			LocalDate orderDate= LocalDate.of(year, month, day);
-			orderResponse.setOrderDate(orderDate);
-			
-			
-			BookResponse bookResponse = new BookResponse();
-			BeanUtils.copyProperties(order.getBook(), bookResponse);
-			bookResponse.setImageURL(baseURL+"/api/image/"+order.getBook().getCoverImage().getId());
-			
-			orderResponse.setBook(bookResponse);
-			orders.add(orderResponse);
-		});
-		
 		return ResponseEntity.ok(orders);
+		
+	}
+	
+	@GetMapping("/seller/{sellerId}/allOrders")
+	public ResponseEntity<List<BookOrderResponse>> getOrdersBySeller(@PathVariable Long sellerId)  {
+		
+		List<BookOrderResponse> sellerOrders = service.fetchOrdersBySellerId(sellerId);
+		
+		return ResponseEntity.ok(sellerOrders);
 		
 	}
 	
@@ -105,12 +91,10 @@ public class BookOrderController {
 		
 		Boolean changeOrderStatus = service.changeOrderStatus(orderId, status);
 		
-		if(changeOrderStatus==true) {
-			
+		if(changeOrderStatus==true) {		
 			return ResponseEntity.ok("status updated with "+status);
 			
-		} else {
-			
+		} else {		
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("status updation failed...");
 		}
 		 

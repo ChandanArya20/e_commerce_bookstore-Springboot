@@ -3,6 +3,7 @@ package in.ineuron.services;
 import java.util.List;
 
 import in.ineuron.dto.AddressRequest;
+import in.ineuron.dto.BookOrderResponse;
 import in.ineuron.dto.UserResponse;
 import in.ineuron.models.Address;
 import in.ineuron.models.Book;
@@ -24,6 +25,7 @@ public interface BookstoreService {
 	public List<Address>  fetchAddressByUserId(Long userId);
 	public Boolean insertUserAddress(AddressRequest address,  Long userId);
 	
+	
 	public Boolean isSellerAvailableByPhone(String phone);
 	public Boolean isSellerAvailableByEmail(String email);
 	public Boolean isSellerAvailableBySellerId(String sellerId);
@@ -42,13 +44,16 @@ public interface BookstoreService {
 	public Integer activateBookStatus(Long id);
 	public Integer deactivateBookStatus(Long id);
 	
+	
 	public Boolean insertCartData(Cart cart);
 	public List<Cart> getAllCartDataByUser(User user);
 	public Boolean updateCartItemQuantity(Cart cart);
 	public Boolean deleteCartItems(Cart[] carts);
 	
+	
 	public Boolean insertOrder(List<BookOrder> orders);
-	public List<BookOrder> fetchOrdersByUser(User user);
+	public List<BookOrderResponse> fetchOrdersByUser(User user);
+	public List<BookOrderResponse> fetchOrdersBySellerId(Long id);
 	public Boolean changeOrderStatus(Long orderId, String status);
 	
 
