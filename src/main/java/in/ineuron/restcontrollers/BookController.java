@@ -32,6 +32,7 @@ import in.ineuron.dto.BookResponse;
 import in.ineuron.models.Book;
 import in.ineuron.models.ImageFile;
 import in.ineuron.services.BookstoreService;
+import in.ineuron.utils.BookUtils;
 
 @RestController
 @RequestMapping("/api/book")
@@ -45,6 +46,9 @@ public class BookController {
 	
 	@Autowired
 	private ObjectMapper mapper;
+	
+	@Autowired
+	BookUtils bookUtils;
 
 	
 	@PostMapping("seller/addBook") 
@@ -75,18 +79,8 @@ public class BookController {
 		 		
 		List<Book> bookList = service.fetchBooksBySellerId(sellerId);	
 		
-		List<BookResponse> bookResponseList= new ArrayList<>();
+		List<BookResponse> bookResponseList = bookUtils.getBookResponse(bookList);
 		
-		if(bookList!=null) {
-			
-			bookList.forEach((book)->{ 
-				BookResponse bookResponse = new BookResponse();
-				BeanUtils.copyProperties(book, bookResponse);
-				bookResponse.setImageURL(baseURL+"/api/image/"+book.getCoverImage().getId());
-				bookResponseList.add(bookResponse);
-			});
-			
-		}
 		return ResponseEntity.ok(bookResponseList);
 		
 	}	
@@ -146,6 +140,30 @@ public class BookController {
 
 		return ResponseEntity.ok("Status changed successfully");
 		
+	}
+	
+	@GetMapping("/search/title")
+	public List<BookResponse> getAllBooksByTitle( @RequestParam  String query){
+		
+		List<BookResponse> searchedBooks = service.searchBooksByTitle(query);
+		
+		return searchedBooks;
+	}
+	
+	@GetMapping("/search/category")
+	public List<BookResponse> getAllBooksByCategory( @RequestParam  String query){
+		
+		List<BookResponse> searchedBooks = service.searchBooksByCategory(query);
+		
+		return searchedBooks;
+	}
+	
+	@GetMapping("/search/description")
+	public List<BookResponse> getAllBooksByDescription( @RequestParam  String query){
+		
+		List<BookResponse> searchedBooks = service.searchBooksByDescription(query);
+		
+		return searchedBooks;
 	}
 }
 

@@ -41,6 +41,7 @@ public class BookSeller {
     private String password;
     
     @OneToMany(mappedBy = "bookSeller", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Book> books;
     
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

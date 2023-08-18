@@ -3,8 +3,12 @@ package in.ineuron.services;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collector;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
@@ -34,6 +38,8 @@ import in.ineuron.repositories.SellerRepository;
 import in.ineuron.repositories.UserRepository;
 import in.ineuron.returntype.AddressReturn;
 
+import in.ineuron.utils.*;
+
 @Service
 @Transactional
 public class BookstoreServiceImpl implements BookstoreService {
@@ -61,6 +67,9 @@ public class BookstoreServiceImpl implements BookstoreService {
 	
 	@Value("${baseURL}")
 	private String baseURL;
+	
+	@Autowired
+	BookUtils bookUtils;
 	
 	
 	
@@ -283,7 +292,9 @@ public class BookstoreServiceImpl implements BookstoreService {
 	
 	@Override
 	public Boolean insertOrder(List<BookOrder> orders) {
+		
 		List<BookOrder> savedAll = orderRepo.saveAll(orders);
+		
 		if(savedAll!=null)
 			return true;
 		else
@@ -294,29 +305,8 @@ public class BookstoreServiceImpl implements BookstoreService {
 		
 		List<BookOrder> orderList = orderRepo.findByUser(user);
 		
-		List<BookOrderResponse> orders = new ArrayList<>();
-		
-		orderList.forEach(order->{
-			
-			BookOrderResponse orderResponse = new BookOrderResponse();
-			BeanUtils.copyProperties(order, orderResponse);
-			
-			int year = order.getOrderDateTime().getYear();
-			int month = order.getOrderDateTime().getMonthValue();
-			int day = order.getOrderDateTime().getDayOfMonth();
-			
-			LocalDate orderDate= LocalDate.of(year, month, day);
-			orderResponse.setOrderDate(orderDate);
-			
-			
-			BookResponse bookResponse = new BookResponse();
-			BeanUtils.copyProperties(order.getBook(), bookResponse);
-			bookResponse.setImageURL(baseURL+"/api/image/"+order.getBook().getCoverImage().getId());
-			
-			orderResponse.setBook(bookResponse);
-			orders.add(orderResponse);
-		});
-		
+		List<BookOrderResponse> orders = bookUtils.getBookOrderResponse(orderList);
+	
 		return orders;
 	}
 
@@ -338,33 +328,142 @@ public class BookstoreServiceImpl implements BookstoreService {
 		
 		List<BookOrder> orderList = orderRepo.findByBook(bookList);
 		
-		List<BookOrderResponse> orders = new ArrayList<>(); 
-		
-			orderList.forEach(order->{
-			
-			BookOrderResponse orderResponse = new BookOrderResponse();
-			BeanUtils.copyProperties(order, orderResponse);
-			
-			int year = order.getOrderDateTime().getYear();
-			int month = order.getOrderDateTime().getMonthValue();
-			int day = order.getOrderDateTime().getDayOfMonth();
-			
-			LocalDate orderDate= LocalDate.of(year, month, day);
-			orderResponse.setOrderDate(orderDate);
-			
-			
-			BookResponse bookResponse = new BookResponse();
-			BeanUtils.copyProperties(order.getBook(), bookResponse);
-			bookResponse.setImageURL(baseURL+"/api/image/"+order.getBook().getCoverImage().getId());
-			
-			orderResponse.setBook(bookResponse);
-			orders.add(orderResponse);
-		});
+		List<BookOrderResponse> orders = bookUtils.getBookOrderResponse(orderList);
 		
 		return orders;
 	}
 
-	
+	@Override
+	public List<BookResponse> searchBooksByTitle(String query) {
+		
+		List<Book> bookList=new ArrayList<>();
+		Set<Long> uniqueBookIds = new HashSet<>();
+		
+		query = query.trim();
+		
+		List<Book> books = bookRepo.findByTitleContainingIgnoreCaseAndStatus(query, true);
+		for(Book book: books) {
+			
+			if(uniqueBookIds.add(book.getId()))
+				bookList.add(book);
+		}	
+		
+		String[] tokens = query.toLowerCase().split(" ");
+		
+		if(tokens.length>1) {
+
+			Set<String> stopWords=new HashSet<String>(Arrays.asList("and","in","the","a","for"," "));	
+			
+			String[] searchQueryList = Arrays
+										   .stream(tokens)
+										   .filter(token->!stopWords.contains(token))
+										   .toArray(String[]::new);
+			
+			for(String singleQuery: searchQueryList) {
+				
+				List<Book> allBook = bookRepo.findByTitleContainingIgnoreCaseAndStatus(singleQuery, true);		
+				
+				for(Book book: allBook) {
+					
+					if(uniqueBookIds.add(book.getId()))
+						bookList.add(book);
+				}
+			}
+			
+		}
+			
+		List<BookResponse> bookResponse = bookUtils.getBookResponse(bookList);
+		
+		return bookResponse;
+	}
+
+	@Override
+	public List<BookResponse> searchBooksByCategory(String query) {
+		
+		List<Book> bookList=new ArrayList<>();
+		Set<Long> uniqueBookIds = new HashSet<>();
+		
+		query = query.trim();
+		
+		List<Book> books = bookRepo.findByCategoryContainingIgnoreCaseAndStatus(query, true);
+		for(Book book: books) {
+			
+			if(uniqueBookIds.add(book.getId()))
+				bookList.add(book);
+		}	
+		
+		String[] tokens = query.toLowerCase().split(" ");
+		
+		if(tokens.length>1) {
+
+			Set<String> stopWords=new HashSet<String>(Arrays.asList("and","in","the","a","for"," "));	
+			
+			String[] searchQueryList = Arrays
+										   .stream(tokens)
+										   .filter(token->!stopWords.contains(token))
+										   .toArray(String[]::new);
+			
+			for(String singleQuery: searchQueryList) {
+				
+				List<Book> allBook = bookRepo.findByCategoryContainingIgnoreCaseAndStatus(singleQuery, true);		
+				
+				for(Book book: allBook) {
+					
+					if(uniqueBookIds.add(book.getId()))
+						bookList.add(book);
+				}
+			}
+			
+		}
+			
+		List<BookResponse> bookResponse = bookUtils.getBookResponse(bookList);
+		
+		return bookResponse;
+	}
+
+	@Override
+	public List<BookResponse> searchBooksByDescription(String query) {
+		List<Book> bookList=new ArrayList<>();
+		Set<Long> uniqueBookIds = new HashSet<>();
+		
+		query = query.trim();
+		
+		List<Book> books = bookRepo.findByDescriptionContainingIgnoreCaseAndStatus(query, true);
+		for(Book book: books) {
+			
+			if(uniqueBookIds.add(book.getId()))
+				bookList.add(book);
+		}	
+		
+		String[] tokens = query.toLowerCase().split(" ");
+		
+		if(tokens.length>1) {
+
+			Set<String> stopWords=new HashSet<String>(Arrays.asList("and","in","the","a","for"," "));	
+			
+			String[] searchQueryList = Arrays
+										   .stream(tokens)
+										   .filter(token->!stopWords.contains(token))
+										   .toArray(String[]::new);
+			
+			for(String singleQuery: searchQueryList) {
+				
+				List<Book> allBook = bookRepo.findByDescriptionContainingIgnoreCaseAndStatus(singleQuery, true);		
+				
+				for(Book book: allBook) {
+					
+					if(uniqueBookIds.add(book.getId()))
+						bookList.add(book);
+				}
+			}
+			
+		}
+			
+		List<BookResponse> bookResponse = bookUtils.getBookResponse(bookList);
+		
+		return bookResponse;
+	}
+
 	
 
 }

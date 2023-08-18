@@ -52,7 +52,7 @@ public class BookAddRequest {
     private int deliveryTime;
     
     
-    private int edition;
+    private String edition;
     
     private BookSeller bookSeller;
     

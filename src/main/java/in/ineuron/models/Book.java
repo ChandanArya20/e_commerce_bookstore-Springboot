@@ -59,7 +59,7 @@ public class Book {
     @Column(nullable = false)
     private int deliveryTime;
     
-    private int edition;
+    private String edition;
     
     @ManyToOne
     private BookSeller bookSeller;
