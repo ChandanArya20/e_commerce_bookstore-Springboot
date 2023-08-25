@@ -26,7 +26,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import in.ineuron.dto.AllDataBookResponse;
 import in.ineuron.dto.BookAddRequest;
 import in.ineuron.dto.BookResponse;
 import in.ineuron.models.Book;
@@ -143,27 +142,35 @@ public class BookController {
 	}
 	
 	@GetMapping("/search/title")
-	public List<BookResponse> getAllBooksByTitle( @RequestParam  String query){
+	public ResponseEntity<List<BookResponse>> getAllBooksByTitle( @RequestParam  String query){
 		
 		List<BookResponse> searchedBooks = service.searchBooksByTitle(query);
 		
-		return searchedBooks;
+		return ResponseEntity.ok(searchedBooks);
 	}
 	
 	@GetMapping("/search/category")
-	public List<BookResponse> getAllBooksByCategory( @RequestParam  String query){
+	public ResponseEntity<List<BookResponse>> getAllBooksByCategory( @RequestParam  String query){
 		
 		List<BookResponse> searchedBooks = service.searchBooksByCategory(query);
 		
-		return searchedBooks;
+		return ResponseEntity.ok(searchedBooks);
 	}
 	
 	@GetMapping("/search/description")
-	public List<BookResponse> getAllBooksByDescription( @RequestParam  String query){
+	public ResponseEntity<List<BookResponse>> getAllBooksByDescription( @RequestParam  String query){
 		
 		List<BookResponse> searchedBooks = service.searchBooksByDescription(query);
 		
-		return searchedBooks;
+		return ResponseEntity.ok(searchedBooks);
+	}
+	
+	@GetMapping("/search")
+	public ResponseEntity<List<BookResponse>> getSearchedBooks( @RequestParam  String query){
+		
+		List<BookResponse> searchedBooks = service.searchBooks(query);
+		
+		return ResponseEntity.ok(searchedBooks);
 	}
 }
 

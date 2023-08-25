@@ -35,7 +35,7 @@ public class BookAddRequest {
     private String category;
 
    
-    private LocalDate publishingYear;
+    private String publishingYear;
 
     private int pages;
 

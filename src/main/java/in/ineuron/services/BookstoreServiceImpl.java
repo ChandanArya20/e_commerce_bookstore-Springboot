@@ -348,11 +348,12 @@ public class BookstoreServiceImpl implements BookstoreService {
 				bookList.add(book);
 		}	
 		
-		String[] tokens = query.toLowerCase().split(" ");
+		String[] tokens = query.toLowerCase().split("\\s+");
 		
 		if(tokens.length>1) {
 
-			Set<String> stopWords=new HashSet<String>(Arrays.asList("and","in","the","a","for"," "));	
+			Set<String> stopWords=new HashSet<String>(Arrays.asList("and","in","the","a","for"));
+			System.out.println(stopWords);
 			
 			String[] searchQueryList = Arrays
 										   .stream(tokens)
@@ -392,23 +393,24 @@ public class BookstoreServiceImpl implements BookstoreService {
 				bookList.add(book);
 		}	
 		
-		String[] tokens = query.toLowerCase().split(" ");
+		String[] tokens = query.toLowerCase().split("\\s+");
+		System.out.println(Arrays.toString(tokens)+"Line-396");
+		
 		
 		if(tokens.length>1) {
-
-			Set<String> stopWords=new HashSet<String>(Arrays.asList("and","in","the","a","for"," "));	
+			
+			Set<String> stopWords=new HashSet<String>(Arrays.asList("and","in","the","a","for"));	
 			
 			String[] searchQueryList = Arrays
-										   .stream(tokens)
-										   .filter(token->!stopWords.contains(token))
-										   .toArray(String[]::new);
+									   .stream(tokens)
+									   .filter(token->!stopWords.contains(token))
+									   .toArray(String[]::new);
 			
 			for(String singleQuery: searchQueryList) {
-				
+
 				List<Book> allBook = bookRepo.findByCategoryContainingIgnoreCaseAndStatus(singleQuery, true);		
 				
-				for(Book book: allBook) {
-					
+				for(Book book: allBook) {				
 					if(uniqueBookIds.add(book.getId()))
 						bookList.add(book);
 				}
@@ -423,6 +425,7 @@ public class BookstoreServiceImpl implements BookstoreService {
 
 	@Override
 	public List<BookResponse> searchBooksByDescription(String query) {
+		
 		List<Book> bookList=new ArrayList<>();
 		Set<Long> uniqueBookIds = new HashSet<>();
 		
@@ -435,16 +438,16 @@ public class BookstoreServiceImpl implements BookstoreService {
 				bookList.add(book);
 		}	
 		
-		String[] tokens = query.toLowerCase().split(" ");
+		String[] tokens = query.toLowerCase().split("\\s+");
 		
 		if(tokens.length>1) {
 
-			Set<String> stopWords=new HashSet<String>(Arrays.asList("and","in","the","a","for"," "));	
+			Set<String> stopWords=new HashSet<String>(Arrays.asList("and","in","the","a","for"));	
 			
 			String[] searchQueryList = Arrays
-										   .stream(tokens)
-										   .filter(token->!stopWords.contains(token))
-										   .toArray(String[]::new);
+									   .stream(tokens)
+									   .filter(token->!stopWords.contains(token))
+									   .toArray(String[]::new);
 			
 			for(String singleQuery: searchQueryList) {
 				
@@ -464,6 +467,44 @@ public class BookstoreServiceImpl implements BookstoreService {
 		return bookResponse;
 	}
 
+	@Override
+	public List<BookResponse> searchBooks(String query) {
+		
+		ArrayList<BookResponse> bookList = new ArrayList<>();	
+		List<BookResponse> searchedBooks;
+		Set<Long> uniqueBookIds = new HashSet<>();
+		
+		searchedBooks = searchBooksByTitle(query);
+		bookList.addAll(searchedBooks);
+		
+		for(BookResponse book:searchedBooks) {		
+			uniqueBookIds.add(book.getId());
+		}
+		
+		searchedBooks = searchBooksByCategory(query);
+		for(BookResponse book : searchedBooks) {
+			
+			if(uniqueBookIds.add(book.getId())) {
+				bookList.add(book);
+			}
+		}
+		
+		searchedBooks = searchBooksByDescription(query);
+		for(BookResponse book : searchedBooks) {
+			
+			if(uniqueBookIds.add(book.getId())) {
+				bookList.add(book);
+			}
+		}
+		
+		return bookList;
+		
+	}
 	
 
 }
+
+
+
+
+

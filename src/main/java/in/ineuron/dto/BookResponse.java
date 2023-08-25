@@ -1,6 +1,7 @@
 package in.ineuron.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 
@@ -19,6 +20,8 @@ public class BookResponse {
 	    private String author;
 
 	    private String description;
+	    
+	    private LocalDateTime bookListingTime;
 	      
 	    private String isbn;
 
@@ -30,7 +33,7 @@ public class BookResponse {
 
 	    private String category;
 
-	    private LocalDate publishingYear;
+	    private String publishingYear;
 
 	    private int pages;
 

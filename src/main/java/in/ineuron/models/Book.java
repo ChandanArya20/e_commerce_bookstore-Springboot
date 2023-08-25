@@ -1,8 +1,11 @@
 package in.ineuron.models;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.persistence.*;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -27,6 +30,10 @@ public class Book {
     private String description;
     
    
+    @CreationTimestamp
+    private LocalDateTime bookListingTime;
+    
+    
     private String isbn;
 
     @Lob
@@ -43,7 +50,7 @@ public class Book {
     private String category;
 
     @Column(nullable = false)
-    private LocalDate publishingYear;
+    private String publishingYear;
 
     private int pages;
 

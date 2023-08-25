@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.qos.logback.core.joran.util.beans.BeanUtil;
-import in.ineuron.dto.AllDataBookResponse;
 import in.ineuron.dto.BookResponse;
 import in.ineuron.dto.CartResponse;
 import in.ineuron.models.Cart;

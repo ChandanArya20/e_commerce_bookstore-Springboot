@@ -48,8 +48,7 @@ public interface BookstoreService {
 	public List<BookResponse> searchBooksByTitle(String query);
 	public List<BookResponse> searchBooksByCategory(String query);
 	public List<BookResponse> searchBooksByDescription(String query);
-	public List<BookResponse> searchBooksByCategories(String categories);
-	
+	public List<BookResponse> searchBooks(String query);
 	
 	public Boolean insertCartData(Cart cart);
 	public List<Cart> getAllCartDataByUser(User user);
