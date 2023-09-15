@@ -60,6 +60,10 @@ public interface BookstoreService {
 	public List<BookOrderResponse> fetchOrdersByUser(User user);
 	public List<BookOrderResponse> fetchOrdersBySellerId(Long id);
 	public Boolean changeOrderStatus(Long orderId, String status);
+	public BookOrder getOrderById(Long OrderId);
+	public Boolean increaseBookStock(Long bookId, Integer stockValue);
+	public Boolean decreaseBookStock(Long bookId, Integer stockValue);
+	
 	
 	
 

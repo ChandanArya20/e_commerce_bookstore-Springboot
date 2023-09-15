@@ -257,6 +257,7 @@ public class BookstoreServiceImpl implements BookstoreService {
 	    Optional<Cart> existingCartItem = cartRepo.findById(cart.getId());
 
 	    if (existingCartItem.isPresent()) {
+	    	
 	        Cart dbCartItem = existingCartItem.get();
 	        
 	        dbCartItem.setQuantity(cart.getQuantity());
@@ -270,7 +271,7 @@ public class BookstoreServiceImpl implements BookstoreService {
 	            return false;
 	        }
 	    } else {
-	        // Handle the case when the cart item with the provided ID does not exist
+	
 	        return false;
 	    }
 	}
@@ -279,10 +280,7 @@ public class BookstoreServiceImpl implements BookstoreService {
 	@Override
 	public Boolean deleteCartItems(Cart[] carts) {
 		
-		for(Cart cart: carts){	
-			
-			cartRepo.delete(cart);
-		}
+		cartRepo.deleteAllInBatch(Arrays.asList(carts));
 		
 		return true;
 	}
@@ -500,6 +498,39 @@ public class BookstoreServiceImpl implements BookstoreService {
 		return bookList;
 		
 	}
+
+	@Override
+	public BookOrder getOrderById(Long OrderId) {
+		
+		return orderRepo.findById(OrderId).orElse(null);
+
+	}
+	
+	@Override
+	public Boolean increaseBookStock(Long bookId, Integer stockValue) {
+		 
+		Optional<Book> bookOptional = bookRepo.findById(bookId);
+		if(bookOptional.isPresent()) {
+			
+			Book book = bookOptional.get();
+			book.setStockAvailability(book.getStockAvailability()+stockValue);
+			bookRepo.save(book);
+		}
+		return null;
+	}
+	
+	@Override
+	public Boolean decreaseBookStock(Long bookId, Integer stockValue) {
+		Optional<Book> bookOptional = bookRepo.findById(bookId);
+		if(bookOptional.isPresent()) {
+			
+			Book book = bookOptional.get();
+			book.setStockAvailability(book.getStockAvailability()-stockValue);
+			bookRepo.save(book);
+		}
+		return null;
+	}
+
 	
 
 }

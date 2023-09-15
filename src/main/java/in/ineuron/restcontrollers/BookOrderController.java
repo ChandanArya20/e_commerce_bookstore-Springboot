@@ -19,14 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-
 import in.ineuron.dto.BookOrderRequest;
-import in.ineuron.dto.BookResponse;
 import in.ineuron.dto.BookOrderResponse;
-import in.ineuron.models.Book;
 import in.ineuron.models.BookOrder;
-import in.ineuron.models.BookSeller;
 import in.ineuron.models.User;
 import in.ineuron.services.BookstoreService;
 
@@ -56,6 +51,7 @@ public class BookOrderController {
 			bookOrder.setDeliveryDate(deliverydate);
 			
 			bookList.add(bookOrder);
+			service.decreaseBookStock(bookOrder.getBook().getId(), bookOrder.getQuantity());
 			
 		}
 		service.insertOrder(bookList);
@@ -89,12 +85,20 @@ public class BookOrderController {
 		
 		System.out.println(status);
 		
+		if(status.equals("Cancelled") || status.equals("Returned") ) {
+			
+			BookOrder order = service.getOrderById(orderId);
+			service.increaseBookStock(order.getBook().getId(), order.getQuantity());
+		}
+		
 		Boolean changeOrderStatus = service.changeOrderStatus(orderId, status);
 		
-		if(changeOrderStatus==true) {		
+		if(changeOrderStatus==true) {	
+			
 			return ResponseEntity.ok("status updated with "+status);
 			
-		} else {		
+		} else {	
+			
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("status updation failed...");
 		}
 		 

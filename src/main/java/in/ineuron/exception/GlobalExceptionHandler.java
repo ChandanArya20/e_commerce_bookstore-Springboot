@@ -1,4 +1,4 @@
-package in.ineuron.exceptionhandler;
+package in.ineuron.exception;
 
 import java.time.LocalDateTime;
 
@@ -7,8 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import in.ineuron.exceptiondetailsobj.ExceptionDetails;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

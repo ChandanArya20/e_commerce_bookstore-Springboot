@@ -1,4 +1,4 @@
-package in.ineuron.exceptiondetailsobj;
+package in.ineuron.exception;
 
 import java.time.LocalDateTime;
 
