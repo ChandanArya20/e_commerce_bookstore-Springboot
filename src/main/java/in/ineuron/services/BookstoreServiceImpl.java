@@ -466,7 +466,7 @@ public class BookstoreServiceImpl implements BookstoreService {
 	}
 
 	@Override
-	public List<BookResponse> searchBooks(String query) {
+	public List<BookResponse> searchBooks(Integer per_page,Integer page,String query) {
 		
 		ArrayList<BookResponse> bookList = new ArrayList<>();	
 		List<BookResponse> searchedBooks;
@@ -495,8 +495,21 @@ public class BookstoreServiceImpl implements BookstoreService {
 			}
 		}
 		
-		return bookList;
+		int startIndex = (page - 1) * per_page; 
+		int endIndex = Math.min(startIndex + per_page, bookList.size()); // Ensure endIndex doesn't exceed the list size
+	    
+		List<BookResponse> pagedResults=new ArrayList<>();
 		
+		if(startIndex > endIndex) {
+			
+			 return pagedResults;		
+		}else {
+			
+			// Create a sublist of bookList based on the startIndex and endIndex
+			pagedResults = bookList.subList(startIndex, endIndex);
+		}
+			    
+		return pagedResults;		
 	}
 
 	@Override

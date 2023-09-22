@@ -3,8 +3,10 @@ package in.ineuron.restcontrollers;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -65,6 +67,7 @@ public class BookOrderController {
 		user.setId(userId);
 		
 		List<BookOrderResponse> orders = service.fetchOrdersByUser(user);
+		Collections.reverse(orders);
 			
 		return ResponseEntity.ok(orders);
 		
@@ -74,6 +77,7 @@ public class BookOrderController {
 	public ResponseEntity<List<BookOrderResponse>> getOrdersBySeller(@PathVariable Long sellerId)  {
 		
 		List<BookOrderResponse> sellerOrders = service.fetchOrdersBySellerId(sellerId);
+		Collections.reverse(sellerOrders);
 		
 		return ResponseEntity.ok(sellerOrders);
 		

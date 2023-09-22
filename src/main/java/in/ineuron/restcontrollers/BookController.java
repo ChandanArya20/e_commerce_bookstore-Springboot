@@ -166,9 +166,12 @@ public class BookController {
 	}
 	
 	@GetMapping("/search")
-	public ResponseEntity<List<BookResponse>> getSearchedBooks( @RequestParam  String query){
+	public ResponseEntity<List<BookResponse>> getSearchedBooks( 
+			@RequestParam  Integer per_page, 
+			@RequestParam  Integer page, 
+			@RequestParam  String query){
 		
-		List<BookResponse> searchedBooks = service.searchBooks(query);
+		List<BookResponse> searchedBooks = service.searchBooks(per_page,page,query);
 		
 		return ResponseEntity.ok(searchedBooks);
 	}
