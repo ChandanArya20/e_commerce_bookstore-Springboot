@@ -1,13 +1,10 @@
 package in.ineuron.models;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import javax.persistence.*;
 
 import org.hibernate.annotations.CreationTimestamp;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 
@@ -70,12 +67,6 @@ public class Book {
     
     @ManyToOne
     private BookSeller bookSeller;
-     
-
-//    @Column(nullable = false)
-//    private double rating;
-    
-//    private String comments;
     
     @Column(nullable = false)
     private Boolean status=true;

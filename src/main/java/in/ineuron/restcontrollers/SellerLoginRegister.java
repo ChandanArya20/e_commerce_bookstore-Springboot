@@ -1,7 +1,5 @@
 package in.ineuron.restcontrollers;
 
-import java.util.List;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,13 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import in.ineuron.dto.LoginRequest;
-import in.ineuron.dto.LoginResponse;
 import in.ineuron.dto.SellerLoginRequest;
 import in.ineuron.dto.SellerLoginResponse;
 import in.ineuron.dto.SellerRegisterRequest;
 import in.ineuron.models.BookSeller;
-import in.ineuron.models.User;
 import in.ineuron.services.BookstoreService;
 
 @RestController
@@ -46,15 +41,18 @@ public class SellerLoginRegister {
 			 return ResponseEntity.badRequest().body("UserId not available");
 			 
 		 }else {
+			 
 			 BookSeller seller = new BookSeller();
 			 BeanUtils.copyProperties(requestData, seller);
 			 
+			 //encript password
 			 String encodedPassword = passwordEncoder.encode(seller.getPassword());
 			 seller.setPassword(encodedPassword);
 			 service.registerSeller(seller);
 			 
 			 SellerLoginResponse response = new SellerLoginResponse();
-			 			 
+			 
+			 //create token for login
 			 response.setToken((seller.getEmail()+seller.getLocation()).replace(" ",""));				 
 			 response.setSeller(seller);
 			

@@ -34,11 +34,11 @@ public class UserLoginRegister {
 	@Autowired
 	BCryptPasswordEncoder passwordEncoder;
 	
+	
 		
 	@PostMapping("/register") 
 	public ResponseEntity<?> registerUser(@RequestBody RegisterRequest requestData){
-			
-		
+					
 		 if (service.isUserAvailableByPhone(requestData.getPhone())) {		 
 			 
 			 return ResponseEntity.badRequest().body("Phone No. already registerd with another account");
@@ -53,6 +53,7 @@ public class UserLoginRegister {
 			 User user = new User();
 			 BeanUtils.copyProperties(requestData, user);
 			 
+			 //encript password
 			 String encodedPwd = passwordEncoder.encode(user.getPassword());
 			 user.setPassword(encodedPwd);
 			 
@@ -75,8 +76,7 @@ public class UserLoginRegister {
 	
 	@PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginData) {
-		   
-		
+		   	
 		if(loginData.getPhone()!=null) {
 			
 			User user = service.fetchUserByPhone(loginData.getPhone());
@@ -135,24 +135,19 @@ public class UserLoginRegister {
 	public ResponseEntity<?> getWholeUserData( @PathVariable Long userId){
 		
 		UserResponse userResponse = service.fetchUserDetails(userId);
-		if(userResponse!=null)
-			return ResponseEntity.ok(userResponse);
-		else {
+		
+		if(userResponse!=null)	
+			return ResponseEntity.ok(userResponse);	
+		else 			
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User id not found");
-		}
 	}
 	
 	@PostMapping("/{userId}/saveAddress")
 	public ResponseEntity<String> saveUserAddress(@RequestBody AddressRequest address,  @PathVariable Long userId){
 		
-		System.out.println(address);
-		Boolean status = service.insertUserAddress(address, userId);
+		service.insertUserAddress(address, userId);
 		
-		if(status) {
-			return ResponseEntity.ok("Address saved successfully...");
-		} else {
-			return ResponseEntity.badRequest().body("Failed..., UserId not found");
-		}
+		return ResponseEntity.ok("Address saved successfully...");	
 	}
 	
 	@GetMapping("/{userId}/address")
@@ -160,7 +155,7 @@ public class UserLoginRegister {
 		
 		List<Address> addresses = service.fetchAddressByUserId(userId);
 		
-		if(addresses!=null)
+		if(!addresses.isEmpty())
 			return ResponseEntity.ok(addresses);
 		else
 			return ResponseEntity.badRequest().body("Failed..., UserId not found");

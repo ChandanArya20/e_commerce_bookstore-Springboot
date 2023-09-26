@@ -1,12 +1,10 @@
 package in.ineuron.restcontrollers;
 
 import java.time.LocalDate;
-import java.time.Month;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -87,8 +85,6 @@ public class BookOrderController {
 	@PatchMapping("/{orderId}")
 	public ResponseEntity<String> changeBookOrderStatus(@PathVariable Long orderId, @RequestParam String status) {
 		
-		System.out.println(status);
-		
 		if(status.equals("Cancelled") || status.equals("Returned") ) {
 			
 			BookOrder order = service.getOrderById(orderId);
@@ -97,15 +93,10 @@ public class BookOrderController {
 		
 		Boolean changeOrderStatus = service.changeOrderStatus(orderId, status);
 		
-		if(changeOrderStatus==true) {	
-			
-			return ResponseEntity.ok("status updated with "+status);
-			
-		} else {	
-			
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("status updation failed...");
-		}
-		 
+		if(changeOrderStatus)		
+			return ResponseEntity.ok("status updated with "+status);		
+		else	
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("status updation failed...");	 
 	}
 	
 	

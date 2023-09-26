@@ -1,14 +1,12 @@
 package in.ineuron.services;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collector;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
@@ -16,9 +14,9 @@ import javax.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import ch.qos.logback.core.joran.util.beans.BeanUtil;
 import in.ineuron.dto.AddressRequest;
 import in.ineuron.dto.BookOrderResponse;
 import in.ineuron.dto.BookResponse;
@@ -36,7 +34,6 @@ import in.ineuron.repositories.CartRepository;
 import in.ineuron.repositories.ImageFileRepository;
 import in.ineuron.repositories.SellerRepository;
 import in.ineuron.repositories.UserRepository;
-import in.ineuron.returntype.AddressReturn;
 
 import in.ineuron.utils.*;
 
@@ -73,6 +70,9 @@ public class BookstoreServiceImpl implements BookstoreService {
 	
 	
 	
+	
+	// User Repository Operations---------------------------------------------------->
+	
 	@Override
 	public Boolean isUserAvailableByPhone(String phone) {
 		
@@ -87,50 +87,54 @@ public class BookstoreServiceImpl implements BookstoreService {
 
 	@Override
 	public void registerUser(User user) {
+		
 		userRepo.save(user);
 	}
 	
 	@Override
 	public User fetchUserByPhone(String phone) {
+		
 		return userRepo.findByPhone(phone);
 	}
 	
 	@Override
 	public User fetchUserByEmail(String email) {
+		
 		return userRepo.findByEmail(email);
 	}
 	
 	@Override
 	public UserResponse fetchUserDetails(Long userId) {
 
-		User user = userRepo.findById(userId).orElse(null);
-		if(user!=null) {
+		Optional<User> userOptional = userRepo.findById(userId);
+		if(userOptional.isPresent()) {
+			
+			User user = userOptional.get();
 			UserResponse userResponse = new UserResponse();
 			BeanUtils.copyProperties(user, userResponse);
+			
 			return userResponse;
 		}
+		
 		return null;		
 	}
 	
 	@Override
-	public Boolean insertUserAddress(AddressRequest address, Long userId) {
+	public void insertUserAddress(AddressRequest address, Long userId) {
 		
 		System.out.println(address);
-		User user = userRepo.findById(userId).orElse(null);
-		if(user!=null) {
+		Optional<User> userOptional = userRepo.findById(userId);
+		
+		if(userOptional.isPresent()) {
 			
+			User user = userOptional.get();
 			List<Address> userAddress = user.getAddress();
 			
 			Address addressObj = new Address();
 			BeanUtils.copyProperties(address, addressObj);
-			System.out.println(addressObj);
 			userAddress.add(addressObj);
-			userRepo.save(user);
-			entityManager.flush();
-			return true;
 			
-		} else {
-			return false;
+			userRepo.save(user);		
 		}
 	}
 	
@@ -141,85 +145,99 @@ public class BookstoreServiceImpl implements BookstoreService {
 		List<Address> address=new ArrayList<>();
 		
 		if(user!=null)	{
-			address=user.getAddress();		
-			return address;
 			
-		} else {
-			return null;
-		}
-			
+			address=user.getAddress();			
+		} 
+		
+		return address;
 	}
 	
 	
 	
+	
+	// Seller Repository Operations---------------------------------------------------->
+	
 	@Override
 	public Boolean isSellerAvailableByPhone(String phone) {
+		
 		return sellerRepo.existsByPhone(phone);
 	}
 	
 	@Override
 	public Boolean isSellerAvailableByEmail(String email) {
+		
 		return sellerRepo.existsByEmail(email);
 	}
 	
 	@Override
 	public Boolean isSellerAvailableBySellerId(String sellerId) {
+		
 		return sellerRepo.existsBySellerId(sellerId);
 	}
 	
 	@Override
 	public void registerSeller(BookSeller seller) {
-		sellerRepo.save(seller);
 		
+		sellerRepo.save(seller);	
 	}
 	
 	@Override
 	public BookSeller fetchSellerByPhone(String phone) {
+		
 		return sellerRepo.findByPhone(phone);
 	}
 	
 	@Override
 	public BookSeller fetchSellerByEmail(String email) {
+		
 		return sellerRepo.findByEmail(email);
 	}
 	
 	@Override
 	public BookSeller fetchSellerBySellerId(String sellerId) {
+		
 		return sellerRepo.findBySellerId(sellerId);
 	}
 	
 	
 	
+	// Book Repository Operations---------------------------------------------------->
 	
 	@Override
-	public void insertBookInfo(Book book) {		
-		Book savedResult = bookRepo.save(book);
+	public void insertBookInfo(Book book) {	
+		
+		bookRepo.save(book);
 	}
 	
 	@Override
 	public List<Book> fetchBooksBySellerId(Long sellerId) {
+		
 		BookSeller seller = new BookSeller();
 		seller.setId(sellerId);
 		return bookRepo.findByBookSeller(seller);
 	}
 	
 	@Override
-	public ImageFile fetchBookImageById(Long id) {
-		return imageFileRepo.findById(id).orElse(null);
+	public Optional<ImageFile> fetchBookImageById(Long id) {
+		
+		return imageFileRepo.findById(id);
 	}
 	
 	@Override
-	public Book fetchBookById(Long id) {
-		return bookRepo.findById(id).orElse(null);
+	public Optional<Book> fetchBookById(Long id) {
+		
+		return bookRepo.findById(id);
 	}
 	
 	@Override
 	public Book updateBook(Book book) {	
+		
 		return bookRepo.save(book);
 	}
 	
 	@Override
 	public Boolean checkBookStatus(Long id) {
+		
 		return bookRepo.findBookStatusById(id);
 	}
 
@@ -235,102 +253,6 @@ public class BookstoreServiceImpl implements BookstoreService {
 		return bookRepo.deactivateBookStatusById(id);
 	}
 	
-	@Override
-	public Boolean insertCartData(Cart cart) {
-		
-		Cart insertedCartItem = cartRepo.save(cart);
-		if(insertedCartItem!=null)
-			return true;
-		else
-			return false;
-	}
-	
-	@Override
-	public List<Cart> getAllCartDataByUser(User user) {
-		
-		return cartRepo.findByUser(user);
-	}
-	
-	@Override
-	public Boolean updateCartItemQuantity(Cart cart) {
-		
-	    Optional<Cart> existingCartItem = cartRepo.findById(cart.getId());
-
-	    if (existingCartItem.isPresent()) {
-	    	
-	        Cart dbCartItem = existingCartItem.get();
-	        
-	        dbCartItem.setQuantity(cart.getQuantity());
-
-	        // Save the updated cart item
-	        Cart updatedCartItem = cartRepo.save(dbCartItem);
-
-	        if (updatedCartItem != null) {
-	            return true;
-	        } else {
-	            return false;
-	        }
-	    } else {
-	
-	        return false;
-	    }
-	}
-
-	
-	@Override
-	public Boolean deleteCartItems(Cart[] carts) {
-		
-		cartRepo.deleteAllInBatch(Arrays.asList(carts));
-		
-		return true;
-	}
-	
-	
-	
-	
-	@Override
-	public Boolean insertOrder(List<BookOrder> orders) {
-		
-		List<BookOrder> savedAll = orderRepo.saveAll(orders);
-		
-		if(savedAll!=null)
-			return true;
-		else
-			return false;
-	}
-	@Override
-	public List<BookOrderResponse> fetchOrdersByUser(User user) {
-		
-		List<BookOrder> orderList = orderRepo.findByUser(user);
-		
-		List<BookOrderResponse> orders = bookUtils.getBookOrderResponse(orderList);
-	
-		return orders;
-	}
-
-	@Override
-	public Boolean changeOrderStatus(Long orderId, String status) {
-		
-		Integer updateOrderStatus = orderRepo.updateOrderStatus(orderId, status);
-		
-		if(updateOrderStatus==1)
-			return true;
-		else		
-			return false;
-	}
-
-	@Override
-	public List<BookOrderResponse> fetchOrdersBySellerId(Long id) {
-		
-		List<Book> bookList = fetchBooksBySellerId(id);
-		
-		List<BookOrder> orderList = orderRepo.findByBook(bookList);
-		
-		List<BookOrderResponse> orders = bookUtils.getBookOrderResponse(orderList);
-		
-		return orders;
-	}
-
 	@Override
 	public List<BookResponse> searchBooksByTitle(String query) {
 		
@@ -348,10 +270,9 @@ public class BookstoreServiceImpl implements BookstoreService {
 		
 		String[] tokens = query.toLowerCase().split("\\s+");
 		
-		if(tokens.length>1) {
+		if(tokens.length>1) {  		// length is not greater than one means there is no combination of words
 
-			Set<String> stopWords=new HashSet<String>(Arrays.asList("and","in","the","a","for"));
-			System.out.println(stopWords);
+			Set<String> stopWords=new HashSet<>(Arrays.asList("and","in","the","a","for"));
 			
 			String[] searchQueryList = Arrays
 										   .stream(tokens)
@@ -397,7 +318,7 @@ public class BookstoreServiceImpl implements BookstoreService {
 		
 		if(tokens.length>1) {
 			
-			Set<String> stopWords=new HashSet<String>(Arrays.asList("and","in","the","a","for"));	
+			Set<String> stopWords=new HashSet<>(Arrays.asList("and","in","the","a","for"));	
 			
 			String[] searchQueryList = Arrays
 									   .stream(tokens)
@@ -440,7 +361,7 @@ public class BookstoreServiceImpl implements BookstoreService {
 		
 		if(tokens.length>1) {
 
-			Set<String> stopWords=new HashSet<String>(Arrays.asList("and","in","the","a","for"));	
+			Set<String> stopWords=new HashSet<>(Arrays.asList("and","in","the","a","for"));	
 			
 			String[] searchQueryList = Arrays
 									   .stream(tokens)
@@ -466,7 +387,7 @@ public class BookstoreServiceImpl implements BookstoreService {
 	}
 
 	@Override
-	public List<BookResponse> searchBooks(Integer per_page,Integer page,String query) {
+	public List<BookResponse> searchBooks(Integer perPage,Integer page,String query) {
 		
 		ArrayList<BookResponse> bookList = new ArrayList<>();	
 		List<BookResponse> searchedBooks;
@@ -495,8 +416,8 @@ public class BookstoreServiceImpl implements BookstoreService {
 			}
 		}
 		
-		int startIndex = (page - 1) * per_page; 
-		int endIndex = Math.min(startIndex + per_page, bookList.size()); // Ensure endIndex doesn't exceed the list size
+		int startIndex = (page - 1) * perPage; 
+		int endIndex = Math.min(startIndex + perPage, bookList.size()); // Ensure endIndex doesn't exceed the list size
 	    
 		List<BookResponse> pagedResults=new ArrayList<>();
 		
@@ -510,13 +431,6 @@ public class BookstoreServiceImpl implements BookstoreService {
 		}
 			    
 		return pagedResults;		
-	}
-
-	@Override
-	public BookOrder getOrderById(Long OrderId) {
-		
-		return orderRepo.findById(OrderId).orElse(null);
-
 	}
 	
 	@Override
@@ -543,6 +457,189 @@ public class BookstoreServiceImpl implements BookstoreService {
 		}
 		return null;
 	}
+	
+	@Override
+	public List<BookResponse> getSuggestedBooksByTitle(String query, Integer size) {
+		 
+         PageRequest pageRequest = PageRequest.of(0, size); // Limit to the first 10 results
+        
+         List<Book> suggestedBooks = bookRepo.findByTitleContainingIgnoreCase(query, pageRequest);
+        
+        
+         return bookUtils.getBookResponse(suggestedBooks);
+        
+	 }
+	 
+	 @Override
+	 public List<String> getSuggestedBookNamesByTitle(String query, Integer size) {
+		 
+		 PageRequest pageRequest = PageRequest.of(0, size); // Limit to the first 10 results
+		 
+		 List<String> bookList = bookRepo.findBookNamesStartWith(query, pageRequest);			 
+		 
+//		 if(bookList.size()<size) {
+//			 
+//			 List<String> books = bookRepo.findBookNamesContains(query, pageRequest);
+//			 
+//			 Iterator<String> itr = books.iterator();
+//			 int sizeCount=bookList.size();
+//			 
+//			 while(itr.hasNext() && sizeCount<10) {
+//				 
+//				 bookList.add(itr.next());
+//				 sizeCount++;
+//			 }
+//		 }
+		 
+		 return bookList;
+	 }
+
+	 @Override
+	 public List<String> getSuggestedBookNamesByExactMatch(String query, Integer size) {
+		 
+	     List<String> exactMatchBookNames = new ArrayList<>();
+	     PageRequest pageRequest = PageRequest.of(0, 5*size);  //Fetchs large amount of data at a time
+	     
+	     while (exactMatchBookNames.size() < size) {
+	         
+	         List<String> bookNames = bookRepo.findBookNamesContains(query, pageRequest);
+	         
+	         // If database doesn't have more data
+             if (bookNames.isEmpty()) {
+                 break;
+             }
+	        
+	         //Filter the exact matched book names
+	         List<String> exactMatchedStrings = getExactMatchedContainingStrings(bookNames, query);
+	         exactMatchBookNames.addAll(exactMatchedStrings);
+	         	         	        
+	         // Increment the page number to fetch the next set of data
+	         pageRequest = PageRequest.of(pageRequest.getPageNumber() + 1, 5*size);
+	     }
+	     
+	     // Slice the list to contain only the first 'size' elements before returning
+	     if (exactMatchBookNames.size() > size) {
+	         exactMatchBookNames = exactMatchBookNames.subList(0, size);
+	     }
+	     
+	     return exactMatchBookNames;
+	 }
+	 
+	 public List<String> getExactMatchedContainingStrings(List<String> textList, String key){
+		 
+		 List<String> exactMatchTextNames=new ArrayList<>();
+		 
+		 for (String text : textList) {
+        	 
+             // Replace all special characters with spaces
+             String sanitizedTextName = text.replaceAll("[^a-zA-Z0-9\\s]", " ");
+             
+             String[] words = sanitizedTextName.split("\\s+");
+             
+			// Check if any word in the book name is an exact match to the query
+             for (String word : words) {
+            	 
+                 if (word.equalsIgnoreCase(key)) {
+                	 
+                	 exactMatchTextNames.add(text);
+                     break;
+                 }
+             }
+         }
+		 
+		 return exactMatchTextNames;
+	 }
+
+	
+	 
+	 
+	 
+	// Cart Repository Operations---------------------------------------------------->
+	 
+	@Override
+	public void insertCartData(Cart cart) {
+		
+		cartRepo.save(cart);		
+	}
+	
+	@Override
+	public List<Cart> getAllCartDataByUser(User user) {
+		
+		return cartRepo.findByUser(user);
+	}
+	
+	@Override
+	public void updateCartItemQuantity(Cart cart) {
+		
+	    Optional<Cart> existingCartItem = cartRepo.findById(cart.getId());
+
+	    if (existingCartItem.isPresent()) {
+	    	
+	        Cart dbCartItem = existingCartItem.get();
+	        
+	        dbCartItem.setQuantity(cart.getQuantity());
+
+	        // Save the updated cart item
+	        cartRepo.save(dbCartItem);	      
+	    } 	    
+	}
+	
+	@Override
+	public void deleteCartItems(Cart[] carts) {
+		
+		cartRepo.deleteAllInBatch(Arrays.asList(carts));	
+	}
+	
+	 
+	 
+	
+	// BookOrder Repository Operations---------------------------------------------------->
+	
+	@Override
+	public Boolean insertOrder(List<BookOrder> orders) {
+		
+		List<BookOrder> savedOrders = orderRepo.saveAll(orders);
+		
+		return !savedOrders.isEmpty();
+	}
+	
+	@Override
+	public List<BookOrderResponse> fetchOrdersByUser(User user) {
+		
+		List<BookOrder> orderList = orderRepo.findByUser(user);
+		
+		List<BookOrderResponse> orders = bookUtils.getBookOrderResponse(orderList);
+	
+		return orders;
+	}
+
+	@Override
+	public Boolean changeOrderStatus(Long orderId, String status) {
+		
+		Integer updateOrderStatus = orderRepo.updateOrderStatus(orderId, status);
+		
+		return updateOrderStatus==1;
+	}
+
+	@Override
+	public List<BookOrderResponse> fetchOrdersBySellerId(Long id) {
+		
+		List<Book> bookList = fetchBooksBySellerId(id);
+		
+		List<BookOrder> orderList = orderRepo.findByBook(bookList);
+		
+		List<BookOrderResponse> orders = bookUtils.getBookOrderResponse(orderList);
+		
+		return orders;
+	}
+
+	@Override
+	public BookOrder getOrderById(Long orderId) {
+		
+		return orderRepo.findById(orderId).orElse(null);
+	}
+	
+	
 
 	
 

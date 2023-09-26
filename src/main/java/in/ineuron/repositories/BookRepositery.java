@@ -1,8 +1,8 @@
 package in.ineuron.repositories;
 
-import java.util.Collection;
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -30,6 +30,15 @@ public interface BookRepositery extends JpaRepository<Book, Long> {
 	 public List<Book> findByCategoryContainingIgnoreCaseAndStatus(String query, Boolean status);
 	 public List<Book> findByDescriptionContainingIgnoreCaseAndStatus(String query, Boolean status);
 	 
+	 
+	 List<Book> findByTitleContainingIgnoreCase(String query, Pageable pageable);
+	 
+	 @Query("SELECT b.title FROM Book b WHERE LOWER(b.title) LIKE LOWER(CONCAT('%', :query , '%')) AND b.status = true")
+	 List<String> findBookNamesContains(String query, Pageable pageable);
+	 
+	 @Query("SELECT b.title FROM Book b WHERE LOWER(b.title) LIKE LOWER(CONCAT(:query, '%')) AND b.status = true")
+	 List<String> findBookNamesStartWith(String query, Pageable pageable);
+
 
 
 }

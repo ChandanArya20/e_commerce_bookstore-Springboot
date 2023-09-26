@@ -1,7 +1,7 @@
 package in.ineuron.services;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import in.ineuron.dto.AddressRequest;
 import in.ineuron.dto.BookOrderResponse;
@@ -14,10 +14,10 @@ import in.ineuron.models.BookSeller;
 import in.ineuron.models.Cart;
 import in.ineuron.models.ImageFile;
 import in.ineuron.models.User;
-import in.ineuron.returntype.AddressReturn;
 
 public interface BookstoreService {
 
+	// User Repository methods
 	public Boolean isUserAvailableByPhone(String phone);
 	public Boolean isUserAvailableByEmail(String email);
 	public void registerUser(User user);
@@ -25,9 +25,10 @@ public interface BookstoreService {
 	public User fetchUserByEmail(String email);
 	public UserResponse fetchUserDetails(Long userId);
 	public List<Address>  fetchAddressByUserId(Long userId);
-	public Boolean insertUserAddress(AddressRequest address,  Long userId);
+	public void insertUserAddress(AddressRequest address,  Long userId);
 	
 	
+	// Seller Repository methods
 	public Boolean isSellerAvailableByPhone(String phone);
 	public Boolean isSellerAvailableByEmail(String email);
 	public Boolean isSellerAvailableBySellerId(String sellerId);
@@ -37,10 +38,11 @@ public interface BookstoreService {
 	public BookSeller fetchSellerBySellerId(String sellerId);
 	
 	
+	// Book Repository methods
 	public void insertBookInfo(Book book);
 	public List<Book> fetchBooksBySellerId(Long sellerId);
-	public ImageFile fetchBookImageById(Long id);
-	public Book fetchBookById(Long id);
+	public Optional<ImageFile> fetchBookImageById(Long id);
+	public Optional<Book> fetchBookById(Long id);
 	public Book updateBook(Book book);
 	public Boolean checkBookStatus(Long id);
 	public Integer activateBookStatus(Long id);
@@ -49,20 +51,26 @@ public interface BookstoreService {
 	public List<BookResponse> searchBooksByCategory(String query);
 	public List<BookResponse> searchBooksByDescription(String query);
 	public List<BookResponse> searchBooks(Integer per_page,Integer page,String query);
+	public Boolean increaseBookStock(Long bookId, Integer stockValue);
+	public Boolean decreaseBookStock(Long bookId, Integer stockValue);
+	public List<BookResponse> getSuggestedBooksByTitle(String query, Integer size);
+	public List<String> getSuggestedBookNamesByTitle(String query, Integer size);
+	public List<String> getSuggestedBookNamesByExactMatch(String query, Integer size);
 	
-	public Boolean insertCartData(Cart cart);
+	
+	// Cart Repository methods
+	public void insertCartData(Cart cart);
 	public List<Cart> getAllCartDataByUser(User user);
-	public Boolean updateCartItemQuantity(Cart cart);
-	public Boolean deleteCartItems(Cart[] carts);
+	public void updateCartItemQuantity(Cart cart);
+	public void deleteCartItems(Cart[] carts);
 	
 	
+	// BookOrder Repository methods
 	public Boolean insertOrder(List<BookOrder> orders);
 	public List<BookOrderResponse> fetchOrdersByUser(User user);
 	public List<BookOrderResponse> fetchOrdersBySellerId(Long id);
 	public Boolean changeOrderStatus(Long orderId, String status);
 	public BookOrder getOrderById(Long OrderId);
-	public Boolean increaseBookStock(Long bookId, Integer stockValue);
-	public Boolean decreaseBookStock(Long bookId, Integer stockValue);
 	
 	
 	

@@ -36,18 +36,15 @@ public class CartController {
 	private String baseURL;
 	
 	
+	
 	@PostMapping("/addToCart")
 	public ResponseEntity<String> addToCart(@RequestBody Cart cart){
 		
-		System.out.println(cart);
+		service.insertCartData(cart);
 		
-		Boolean status = service.insertCartData(cart);
-		if(status==true)
-			return ResponseEntity.ok("Item inserted into cart successfully...");
-		else
-			return ResponseEntity.ok("Item insertion unsuccessfull...");
+		return ResponseEntity.ok("Item inserted into cart successfully...");
 	}
-	
+		 
 	@GetMapping("/user/{userId}/allCartData")
 	public ResponseEntity<List<CartResponse>> getAllCartDataByUser(@PathVariable Long userId){
 		
@@ -60,6 +57,7 @@ public class CartController {
 		List<CartResponse> cartResponseList=new ArrayList<>();
 		
 		cartList.forEach((cart)->{
+			
 			CartResponse cartResponse = new CartResponse();
 			BeanUtils.copyProperties(cart, cartResponse);
 			
@@ -77,23 +75,20 @@ public class CartController {
 	@PatchMapping("/updateCartQuantity")
 	public ResponseEntity<String> updateCart(@RequestBody Cart cart){
 		
-		Boolean status = service.updateCartItemQuantity(cart);
+		service.updateCartItemQuantity(cart);
 		
-		if(status==true) {
-			return ResponseEntity.ok("Cart Item quantity got updated...");
-		} else {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cart Item quantity updation got failed...");
-		}
-
+		return ResponseEntity.ok("Cart Item quantity got updated...");
 	}
+	
 	@DeleteMapping("/delete")
 	public ResponseEntity<String> deleteCart(@RequestBody Cart[] carts){
 		
 		service.deleteCartItems(carts);
 		
-		return ResponseEntity.ok("Cart Item quantity got updated...");
-		
+		return ResponseEntity.ok("Cart Item quantity got updated...");		
 	}
+	
+	
 }
 
 

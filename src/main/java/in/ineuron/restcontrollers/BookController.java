@@ -3,6 +3,7 @@ package in.ineuron.restcontrollers;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,7 @@ public class BookController {
 	@PostMapping("seller/addBook") 
 	public ResponseEntity<?> updateBookData(@RequestParam MultipartFile coverImage, @RequestParam String bookInfo) throws IOException{
 	
+		//convert string into BookAddRequest object
 		BookAddRequest bookRequest = mapper.readValue(bookInfo, BookAddRequest.class);
 		
 		Book book = new Book();
@@ -65,12 +67,9 @@ public class BookController {
 		
 		book.setCoverImage(imageFile);
 		
-		service.insertBookInfo(book);
+		service.insertBookInfo(book);	
 		
-		
-		return ResponseEntity.ok("Book info inserted successfully...");
-			
-		
+		return ResponseEntity.ok("Book info inserted successfully...");					
 	}
 	
 	@GetMapping("seller/{sellerId}/allBook")
@@ -87,20 +86,27 @@ public class BookController {
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getBookById(@PathVariable Long id) {
 		
-		Book book = service.fetchBookById(id);		
-		if(book!=null) {
+		Optional<Book> bookOptional = service.fetchBookById(id);	
+		
+		if(bookOptional.isPresent()) {
+			
+			Book book = bookOptional.get();
+			
 			BookResponse bookResponse = new BookResponse();
 			BeanUtils.copyProperties(book, bookResponse);
 			bookResponse.setImageURL(baseURL+"/api/image/"+book.getCoverImage().getId());
 			return ResponseEntity.ok(bookResponse);
 			
-		}else
+		}else {
+			
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("book not found for this book id");		
+		}
 	}
 		
 	@PutMapping("seller/updateBook")
 	public ResponseEntity<String> updateBook(@RequestParam MultipartFile coverImage, @RequestParam String bookInfo) throws IOException{
 		
+		//convert string into BookAddRequest object
 		BookAddRequest bookRequest = mapper.readValue(bookInfo, BookAddRequest.class);
 		
 		Book book = new Book();
@@ -116,10 +122,11 @@ public class BookController {
 		Book updatedBook = service.updateBook(book);
 		
 		String msg="";
-		if(updatedBook!=null)
-			msg="Books Info updated successfully";
-		else
-			msg="Books Info updation unsuccessfully";
+		
+		if(updatedBook!=null) 
+			msg="Books Info updated successfully";		
+		else 	
+			msg="Books Info updation unsuccessfully";			
 		
 		return ResponseEntity.ok(msg);
 	}
@@ -129,13 +136,10 @@ public class BookController {
 		
 		Boolean status=service.checkBookStatus(id);
 		
-		if(status==true) {
-			
-			System.out.println("deactivate "+service.deactivateBookStatus(id));
-		}else {
-			System.out.println("activate "+service.activateBookStatus(id));
-			
-		}	
+		if(status)	
+			service.deactivateBookStatus(id);
+		else
+			service.activateBookStatus(id);
 
 		return ResponseEntity.ok("Status changed successfully");
 		
@@ -175,6 +179,23 @@ public class BookController {
 		
 		return ResponseEntity.ok(searchedBooks);
 	}
+	
+	@GetMapping("/suggest_books")
+	public List<BookResponse> getSuggestedBooks(@RequestParam String query, @RequestParam Integer size){
+		
+		List<BookResponse> suggestedBooks = service.getSuggestedBooksByTitle(query, size);
+		
+		return suggestedBooks;	
+	}
+	
+	@GetMapping("/suggest_book_names")
+	public ResponseEntity<List<String>> getSuggestedBookNames(@RequestParam String query, @RequestParam Integer size){
+		
+		List<String> suggestedBooks = service.getSuggestedBookNamesByExactMatch(query, size);
+		
+		return ResponseEntity.ok(suggestedBooks);
+	}
+	
 }
 
 
