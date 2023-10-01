@@ -47,13 +47,12 @@ public interface BookstoreService {
 	public Boolean checkBookStatus(Long id);
 	public Integer activateBookStatus(Long id);
 	public Integer deactivateBookStatus(Long id);
-	public List<BookResponse> searchBooksByTitle(String query);
-	public List<BookResponse> searchBooksByCategory(String query);
-	public List<BookResponse> searchBooksByDescription(String query);
-	public List<BookResponse> searchBooks(Integer per_page,Integer page,String query);
+	public List<BookResponse> searchBooksByTitle(String query, Integer page, Integer size);
+	public List<BookResponse> searchBooksByCategory(String query, Integer page, Integer size);
+	public List<BookResponse> searchBooksByDescription(String query, Integer page, Integer size);
+	public List<BookResponse> searchBooks(String query, Integer page, Integer size);
 	public Boolean increaseBookStock(Long bookId, Integer stockValue);
 	public Boolean decreaseBookStock(Long bookId, Integer stockValue);
-	public List<BookResponse> getSuggestedBooksByTitle(String query, Integer size);
 	public List<String> getSuggestedBookNamesByTitle(String query, Integer size);
 	public List<String> getSuggestedBookNamesByExactMatch(String query, Integer size);
 	

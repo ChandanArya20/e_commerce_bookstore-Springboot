@@ -146,52 +146,74 @@ public class BookController {
 	}
 	
 	@GetMapping("/search/title")
-	public ResponseEntity<List<BookResponse>> getAllBooksByTitle( @RequestParam  String query){
+	public ResponseEntity<List<BookResponse>> getAllBooksByTitle( 
+			@RequestParam  String query,
+			@RequestParam  Integer page,
+			@RequestParam  Integer size){
 		
-		List<BookResponse> searchedBooks = service.searchBooksByTitle(query);
+		List<BookResponse> searchedBooks=new ArrayList<>();
+		
+		if(!query.isBlank()) {
+			
+			searchedBooks = service.searchBooksByTitle(query.trim(), page, size);
+		}
 		
 		return ResponseEntity.ok(searchedBooks);
 	}
 	
 	@GetMapping("/search/category")
-	public ResponseEntity<List<BookResponse>> getAllBooksByCategory( @RequestParam  String query){
+	public ResponseEntity<List<BookResponse>> getAllBooksByCategory( 
+			@RequestParam  String query,
+			@RequestParam  Integer page,
+			@RequestParam  Integer size){
+			
+		List<BookResponse> searchedBooks=new ArrayList<>();
 		
-		List<BookResponse> searchedBooks = service.searchBooksByCategory(query);
-		
+		if(!query.isBlank()) {
+			System.out.println(query+" "+page+" "+size);
+			searchedBooks = service.searchBooksByCategory(query.trim(), page, size);
+		}
 		return ResponseEntity.ok(searchedBooks);
 	}
 	
 	@GetMapping("/search/description")
-	public ResponseEntity<List<BookResponse>> getAllBooksByDescription( @RequestParam  String query){
-		
-		List<BookResponse> searchedBooks = service.searchBooksByDescription(query);
-		
+	public ResponseEntity<List<BookResponse>> getAllBooksByDescription( 
+			@RequestParam  String query,
+			@RequestParam  Integer page,
+			@RequestParam  Integer size){
+			
+		List<BookResponse> searchedBooks=new ArrayList<>();
+		if(!query.isBlank()) {
+			
+			searchedBooks = service.searchBooksByDescription(query.trim(), page, size);
+		}
 		return ResponseEntity.ok(searchedBooks);
 	}
 	
 	@GetMapping("/search")
 	public ResponseEntity<List<BookResponse>> getSearchedBooks( 
-			@RequestParam  Integer per_page, 
 			@RequestParam  Integer page, 
+			@RequestParam  Integer size, 
 			@RequestParam  String query){
-		
-		List<BookResponse> searchedBooks = service.searchBooks(per_page,page,query);
-		
+
+		List<BookResponse> searchedBooks=new ArrayList<>();
+		if(!query.isBlank()) {
+			
+			searchedBooks = service.searchBooks(query,page,size);
+		}
 		return ResponseEntity.ok(searchedBooks);
 	}
 	
-	@GetMapping("/suggest_books")
-	public List<BookResponse> getSuggestedBooks(@RequestParam String query, @RequestParam Integer size){
-		
-		List<BookResponse> suggestedBooks = service.getSuggestedBooksByTitle(query, size);
-		
-		return suggestedBooks;	
-	}
 	
 	@GetMapping("/suggest_book_names")
 	public ResponseEntity<List<String>> getSuggestedBookNames(@RequestParam String query, @RequestParam Integer size){
 		
-		List<String> suggestedBooks = service.getSuggestedBookNamesByExactMatch(query, size);
+		List<String> suggestedBooks=new ArrayList<>();
+		
+		if(!query.isBlank()) {
+			
+			suggestedBooks = service.getSuggestedBookNamesByTitle(query.trim(), size);
+		}
 		
 		return ResponseEntity.ok(suggestedBooks);
 	}

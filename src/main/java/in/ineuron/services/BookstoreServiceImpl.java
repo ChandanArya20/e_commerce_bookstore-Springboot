@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -254,183 +255,177 @@ public class BookstoreServiceImpl implements BookstoreService {
 	}
 	
 	@Override
-	public List<BookResponse> searchBooksByTitle(String query) {
+	public List<BookResponse> searchBooksByTitle(String query, Integer page, Integer size) {
 		
-		List<Book> bookList=new ArrayList<>();
-		Set<Long> uniqueBookIds = new HashSet<>();
-		
-		query = query.trim();
-		
-		List<Book> books = bookRepo.findByTitleContainingIgnoreCaseAndStatus(query, true);
-		for(Book book: books) {
-			
-			if(uniqueBookIds.add(book.getId()))
-				bookList.add(book);
-		}	
-		
-		String[] tokens = query.toLowerCase().split("\\s+");
-		
-		if(tokens.length>1) {  		// length is not greater than one means there is no combination of words
+	    // To hold unique books without duplication, maintaining insertion order.
+	    Set<Book> uniqueBooks = new LinkedHashSet<>();
 
-			Set<String> stopWords=new HashSet<>(Arrays.asList("and","in","the","a","for"));
-			
-			String[] searchQueryList = Arrays
-										   .stream(tokens)
-										   .filter(token->!stopWords.contains(token))
-										   .toArray(String[]::new);
-			
-			for(String singleQuery: searchQueryList) {
-				
-				List<Book> allBook = bookRepo.findByTitleContainingIgnoreCaseAndStatus(singleQuery, true);		
-				
-				for(Book book: allBook) {
-					
-					if(uniqueBookIds.add(book.getId()))
-						bookList.add(book);
-				}
-			}
-			
-		}
-			
-		List<BookResponse> bookResponse = bookUtils.getBookResponse(bookList);
-		
-		return bookResponse;
+	    // Try to fetch books with titles that start with the query.
+	    List<Book> books = bookRepo.findBooksStartWith(query, PageRequest.of(0, size));
+	    uniqueBooks.addAll(books);
+	    
+	    // Tokenize the query to handle multi-word searches.
+	    String[] tokens = query.toLowerCase().split("\\s+");
+	               
+        List<String> searchQueryList = bookUtils.filterStopWords(tokens);
+        
+        
+        // Search for each individual query term.
+        for (String singleQuery : searchQueryList) {
+            
+            List<Book> allBooks = bookRepo.
+            		findByTitleContainingIgnoreCaseAndStatus(singleQuery, PageRequest.of(page-1,size*5), true); 
+
+            List<Book> exactMatchedBooks = bookUtils.getExactTitleMatchedContainingBooks(allBooks, singleQuery);
+            
+            uniqueBooks.addAll(exactMatchedBooks); 
+            
+            if(uniqueBooks.size()>size) {
+            	break;
+            }
+        }
+	    
+        if(uniqueBooks.size()>size) {
+        	return bookUtils.getBookResponse(uniqueBooks).subList(0, size-1);
+        }
+	    return bookUtils.getBookResponse(uniqueBooks);
 	}
 
 	@Override
-	public List<BookResponse> searchBooksByCategory(String query) {
+	public List<BookResponse> searchBooksByCategory(String query, Integer page, Integer size) {
 		
-		List<Book> bookList=new ArrayList<>();
-		Set<Long> uniqueBookIds = new HashSet<>();
-		
-		query = query.trim();
-		
-		List<Book> books = bookRepo.findByCategoryContainingIgnoreCaseAndStatus(query, true);
-		for(Book book: books) {
-			
-			if(uniqueBookIds.add(book.getId()))
-				bookList.add(book);
-		}	
-		
-		String[] tokens = query.toLowerCase().split("\\s+");
-		System.out.println(Arrays.toString(tokens)+"Line-396");
-		
-		
-		if(tokens.length>1) {
-			
-			Set<String> stopWords=new HashSet<>(Arrays.asList("and","in","the","a","for"));	
-			
-			String[] searchQueryList = Arrays
-									   .stream(tokens)
-									   .filter(token->!stopWords.contains(token))
-									   .toArray(String[]::new);
-			
-			for(String singleQuery: searchQueryList) {
+		// To hold unique books without duplication, maintaining insertion order.
+	    Set<Book> uniqueBooks = new LinkedHashSet<>();
+	 	    
+	    // Tokenize the query to handle multi-word searches.
+	    String[] tokens = query.toLowerCase().split("\\s+");
+	               
+        List<String> searchQueryList = bookUtils.filterStopWords(tokens);
+        
+        
+        // Search for each individual query term.
+        for (String singleQuery : searchQueryList) {
+            
+            List<Book> allBooks = bookRepo.
+            		findByCategoryContainingIgnoreCaseAndStatus(singleQuery, PageRequest.of(page-1,size*5), true); 
 
-				List<Book> allBook = bookRepo.findByCategoryContainingIgnoreCaseAndStatus(singleQuery, true);		
-				
-				for(Book book: allBook) {				
-					if(uniqueBookIds.add(book.getId()))
-						bookList.add(book);
-				}
-			}
-			
-		}
-			
-		List<BookResponse> bookResponse = bookUtils.getBookResponse(bookList);
-		
-		return bookResponse;
+            List<Book> exactMatchedBooks = bookUtils.getExactCategoryMatchedContainingBooks(allBooks, singleQuery);
+            
+            uniqueBooks.addAll(exactMatchedBooks); 
+            
+            if(uniqueBooks.size()>size) {
+            	break;
+            }
+        }
+	    
+        if(uniqueBooks.size()>size) {
+        	return bookUtils.getBookResponse(uniqueBooks).subList(0, size-1);
+        }
+	    return bookUtils.getBookResponse(uniqueBooks);
 	}
 
 	@Override
-	public List<BookResponse> searchBooksByDescription(String query) {
+	public List<BookResponse> searchBooksByDescription(String query, Integer page, Integer size) {
 		
-		List<Book> bookList=new ArrayList<>();
-		Set<Long> uniqueBookIds = new HashSet<>();
-		
-		query = query.trim();
-		
-		List<Book> books = bookRepo.findByDescriptionContainingIgnoreCaseAndStatus(query, true);
-		for(Book book: books) {
-			
-			if(uniqueBookIds.add(book.getId()))
-				bookList.add(book);
-		}	
-		
-		String[] tokens = query.toLowerCase().split("\\s+");
-		
-		if(tokens.length>1) {
+		// To hold unique books without duplication, maintaining insertion order.
+	    Set<Book> uniqueBooks = new LinkedHashSet<>();
+	    
+	    // Tokenize the query to handle multi-word searches.
+	    String[] tokens = query.toLowerCase().split("\\s+");
+	               
+        List<String> searchQueryList = bookUtils.filterStopWords(tokens);
+        
+        
+        // Search for each individual query term.
+        for (String singleQuery : searchQueryList) {
+            
+            List<Book> allBooks = bookRepo.
+            		findByDescriptionContainingIgnoreCaseAndStatus(singleQuery, PageRequest.of(page-1,size*5), true); 
 
-			Set<String> stopWords=new HashSet<>(Arrays.asList("and","in","the","a","for"));	
-			
-			String[] searchQueryList = Arrays
-									   .stream(tokens)
-									   .filter(token->!stopWords.contains(token))
-									   .toArray(String[]::new);
-			
-			for(String singleQuery: searchQueryList) {
-				
-				List<Book> allBook = bookRepo.findByDescriptionContainingIgnoreCaseAndStatus(singleQuery, true);		
-				
-				for(Book book: allBook) {
-					
-					if(uniqueBookIds.add(book.getId()))
-						bookList.add(book);
-				}
-			}
-			
-		}
-			
-		List<BookResponse> bookResponse = bookUtils.getBookResponse(bookList);
-		
-		return bookResponse;
+            List<Book> exactMatchedBooks = bookUtils.getExactDescriptionMatchedContainingBooks(allBooks, singleQuery);
+            
+            uniqueBooks.addAll(exactMatchedBooks); 
+            
+            if(uniqueBooks.size()>size) {
+            	break;
+            }
+        }
+	    
+        if(uniqueBooks.size()>size) {
+        	return bookUtils.getBookResponse(uniqueBooks).subList(0, size-1);
+        }
+	    return bookUtils.getBookResponse(uniqueBooks);
 	}
 
 	@Override
-	public List<BookResponse> searchBooks(Integer perPage,Integer page,String query) {
+	public List<BookResponse> searchBooks(String query, Integer page, Integer size) {
 		
-		ArrayList<BookResponse> bookList = new ArrayList<>();	
+		System.out.println(page+" "+size);
+		
+		Set<BookResponse> bookList = new LinkedHashSet<>();	
 		List<BookResponse> searchedBooks;
-		Set<Long> uniqueBookIds = new HashSet<>();
 		
-		searchedBooks = searchBooksByTitle(query);
+		searchedBooks = searchBooksByTitle(query, page,size);
 		bookList.addAll(searchedBooks);
 		
-		for(BookResponse book:searchedBooks) {		
-			uniqueBookIds.add(book.getId());
-		}
 		
-		searchedBooks = searchBooksByCategory(query);
-		for(BookResponse book : searchedBooks) {
-			
-			if(uniqueBookIds.add(book.getId())) {
-				bookList.add(book);
-			}
-		}
+		searchedBooks = searchBooksByCategory(query, page,size);
+		bookList.addAll(searchedBooks);
 		
-		searchedBooks = searchBooksByDescription(query);
-		for(BookResponse book : searchedBooks) {
-			
-			if(uniqueBookIds.add(book.getId())) {
-				bookList.add(book);
-			}
-		}
+		searchedBooks = searchBooksByDescription(query, page,size);
+		bookList.addAll(searchedBooks);
 		
-		int startIndex = (page - 1) * perPage; 
-		int endIndex = Math.min(startIndex + perPage, bookList.size()); // Ensure endIndex doesn't exceed the list size
 	    
 		List<BookResponse> pagedResults=new ArrayList<>();
 		
-		if(startIndex > endIndex) {
-			
-			 return pagedResults;		
-		}else {
-			
-			// Create a sublist of bookList based on the startIndex and endIndex
-			pagedResults = bookList.subList(startIndex, endIndex);
+		System.out.println("First time  :"+bookList.size());
+		for(BookResponse b:bookList) {
+			System.out.println(b.getId()+" ");
 		}
-			    
-		return pagedResults;		
+				
+			
+		if(bookList.size()<size) {
+			List<Book> books;
+
+			books=bookRepo.findByTitleContainingIgnoreCaseAndStatus(query, PageRequest.of(page-1, size),true);
+			searchedBooks = bookUtils.getBookResponse(books);
+			bookList.addAll(searchedBooks);
+			System.out.println("Book length: "+books.size());
+			for(Book b:books) {
+				System.out.println(b.getId()+" ");
+			}
+			
+			
+			books=bookRepo.findByCategoryContainingIgnoreCaseAndStatus(query, PageRequest.of(page-1, size),true);
+			searchedBooks = bookUtils.getBookResponse(books);
+			bookList.addAll(searchedBooks);
+			System.out.println("Book length: "+books.size());
+			for(Book b:books) {
+				System.out.println(b.getId()+" ");
+			}
+			
+			books=bookRepo.findByDescriptionContainingIgnoreCaseAndStatus(query, PageRequest.of(page-1, size),true);
+			searchedBooks = bookUtils.getBookResponse(books);
+			bookList.addAll(searchedBooks);
+			System.out.println("Book length: "+books.size());
+			for(Book b:books) {
+				System.out.println(b.getId()+" ");
+			}
+			
+		}
+		
+		int startIndex = (page - 1) * size; 
+		int endIndex = Math.min(startIndex + size, bookList.size()); // Ensure endIndex doesn't exceed the list size
+		
+		if(startIndex>endIndex) {
+			return pagedResults;
+		}else {		
+			pagedResults.addAll(bookList);
+			System.out.println("Page :"+pagedResults.size());
+			System.out.println(startIndex+" "+endIndex);
+			return pagedResults.subList(startIndex, endIndex);
+		}
+					
 	}
 	
 	@Override
@@ -458,38 +453,13 @@ public class BookstoreServiceImpl implements BookstoreService {
 		return null;
 	}
 	
-	@Override
-	public List<BookResponse> getSuggestedBooksByTitle(String query, Integer size) {
-		 
-         PageRequest pageRequest = PageRequest.of(0, size); // Limit to the first 10 results
-        
-         List<Book> suggestedBooks = bookRepo.findByTitleContainingIgnoreCase(query, pageRequest);
-        
-        
-         return bookUtils.getBookResponse(suggestedBooks);
-        
-	 }
 	 
 	 @Override
 	 public List<String> getSuggestedBookNamesByTitle(String query, Integer size) {
 		 
 		 PageRequest pageRequest = PageRequest.of(0, size); // Limit to the first 10 results
 		 
-		 List<String> bookList = bookRepo.findBookNamesStartWith(query, pageRequest);			 
-		 
-//		 if(bookList.size()<size) {
-//			 
-//			 List<String> books = bookRepo.findBookNamesContains(query, pageRequest);
-//			 
-//			 Iterator<String> itr = books.iterator();
-//			 int sizeCount=bookList.size();
-//			 
-//			 while(itr.hasNext() && sizeCount<10) {
-//				 
-//				 bookList.add(itr.next());
-//				 sizeCount++;
-//			 }
-//		 }
+		 List<String> bookList = bookRepo.findBookNamesStartWith(query, pageRequest);
 		 
 		 return bookList;
 	 }
@@ -510,7 +480,7 @@ public class BookstoreServiceImpl implements BookstoreService {
              }
 	        
 	         //Filter the exact matched book names
-	         List<String> exactMatchedStrings = getExactMatchedContainingStrings(bookNames, query);
+	         List<String> exactMatchedStrings = bookUtils.getExactMatchedContainingStrings(bookNames, query);
 	         exactMatchBookNames.addAll(exactMatchedStrings);
 	         	         	        
 	         // Increment the page number to fetch the next set of data
@@ -525,30 +495,7 @@ public class BookstoreServiceImpl implements BookstoreService {
 	     return exactMatchBookNames;
 	 }
 	 
-	 public List<String> getExactMatchedContainingStrings(List<String> textList, String key){
-		 
-		 List<String> exactMatchTextNames=new ArrayList<>();
-		 
-		 for (String text : textList) {
-        	 
-             // Replace all special characters with spaces
-             String sanitizedTextName = text.replaceAll("[^a-zA-Z0-9\\s]", " ");
-             
-             String[] words = sanitizedTextName.split("\\s+");
-             
-			// Check if any word in the book name is an exact match to the query
-             for (String word : words) {
-            	 
-                 if (word.equalsIgnoreCase(key)) {
-                	 
-                	 exactMatchTextNames.add(text);
-                     break;
-                 }
-             }
-         }
-		 
-		 return exactMatchTextNames;
-	 }
+	 
 
 	
 	 
